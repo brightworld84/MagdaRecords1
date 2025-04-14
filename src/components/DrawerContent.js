@@ -4,14 +4,11 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Image,
   ScrollView,
-  Switch,
 } from 'react-native';
 import {
   DrawerContentScrollView,
   DrawerItemList,
-  DrawerItem,
 } from '@react-navigation/drawer';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthContext } from '../services/auth';
@@ -118,9 +115,7 @@ const DrawerContent = (props) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
+  container: { flex: 1 },
   header: {
     paddingTop: spacing.large,
     paddingBottom: spacing.medium,
@@ -132,9 +127,7 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.medium,
     alignItems: 'center',
   },
-  avatarContainer: {
-    marginRight: spacing.medium,
-  },
+  avatarContainer: { marginRight: spacing.medium },
   avatar: {
     width: 60,
     height: 60,
@@ -147,9 +140,7 @@ const styles = StyleSheet.create({
     ...typography.h2,
     color: colors.white,
   },
-  userDetails: {
-    flex: 1,
-  },
+  userDetails: { flex: 1 },
   userName: {
     ...typography.h3,
     color: colors.text,
@@ -173,9 +164,7 @@ const styles = StyleSheet.create({
     ...typography.subtitle,
     color: colors.text,
   },
-  linkedAccountsList: {
-    marginTop: spacing.small,
-  },
+  linkedAccountsList: { marginTop: spacing.small },
   linkedAccountItem: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -222,58 +211,3 @@ const styles = StyleSheet.create({
 });
 
 export default DrawerContent;
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer';
-import { Ionicons } from '@expo/vector-icons';
-import colors from '../theme/colors';
-
-export default function DrawerContent(props) {
-  return (
-    <DrawerContentScrollView {...props}>
-      <View style={styles.drawerContent}>
-        <DrawerItem
-          icon={({ color, size }) => (
-            <Ionicons name="home-outline" color={color} size={size} />
-          )}
-          label="Home"
-          onPress={() => props.navigation.navigate('Home')}
-        />
-        <DrawerItem
-          icon={({ color, size }) => (
-            <Ionicons name="document-text-outline" color={color} size={size} />
-          )}
-          label="Records"
-          onPress={() => props.navigation.navigate('Records')}
-        />
-        <DrawerItem
-          icon={({ color, size }) => (
-            <Ionicons name="people-outline" color={color} size={size} />
-          )}
-          label="Providers"
-          onPress={() => props.navigation.navigate('Providers')}
-        />
-        <DrawerItem
-          icon={({ color, size }) => (
-            <Ionicons name="chatbubble-outline" color={color} size={size} />
-          )}
-          label="Health Assistant"
-          onPress={() => props.navigation.navigate('HealthAssistant')}
-        />
-        <DrawerItem
-          icon={({ color, size }) => (
-            <Ionicons name="settings-outline" color={color} size={size} />
-          )}
-          label="Settings"
-          onPress={() => props.navigation.navigate('Settings')}
-        />
-      </View>
-    </DrawerContentScrollView>
-  );
-}
-
-const styles = StyleSheet.create({
-  drawerContent: {
-    flex: 1,
-  },
-});
