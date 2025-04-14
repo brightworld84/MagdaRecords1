@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import AppNavigator from './src/navigation/AppNavigator';
-import { initializeStorage } from './src/services/storage';
+// import { initializeStorage } from './src/services/storage';
 import { AuthProvider } from './src/services/auth';
 import { AppRegistry, View, Text, ActivityIndicator, LogBox } from 'react-native';
 import colors from './src/theme/colors';
-import { initializeOpenAI } from './src/services/ai';
+// import { initializeOpenAI } from './src/services/ai';
 
 // Ignore specific warnings that might be coming from dependencies
 LogBox.ignoreLogs([
@@ -22,7 +22,7 @@ export default function App() {
   useEffect(() => {
     const prepare = async () => {
       try {
-        // Temporarily disable storage and AI init for web
+        // Temporarily disabled during web testing
         // await initializeStorage();
         // const openAIInitialized = await initializeOpenAI();
         // if (openAIInitialized) {
@@ -30,18 +30,9 @@ export default function App() {
         // } else {
         //   console.warn('OpenAI client could not be initialized. AI features will use mock data.');
         // }
-  
+
         await new Promise(resolve => setTimeout(resolve, 500));
       } catch (e) {
-        console.warn('Failed to initialize app:', e);
-      } finally {
-        setIsReady(true);
-      }
-    };
-  
-    prepare();
-  }, []);
-  
         console.warn('Failed to initialize app:', e);
       } finally {
         setIsReady(true);
