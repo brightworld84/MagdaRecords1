@@ -1,45 +1,49 @@
+
 {
   "expo": {
     "name": "MagdaRecords",
     "slug": "magdarecords",
-    "owner": "fulbrightenterprise",
     "version": "1.0.0",
     "orientation": "portrait",
-    "platforms": [
-      "ios",
-      "android",
-      "web"
-    ],
-    "icon": "./icon.png",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
     "splash": {
-      "image": "./icon.png",
+      "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
-    "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.magdarecords"
-    },
+    "assetBundlePatterns": ["**/*"],
     "android": {
+      "package": "com.anonymous.magdarecords",
+      "versionCode": 1,
+      "permissions": [
+        "INTERNET",
+        "SYSTEM_ALERT_WINDOW",
+        "VIBRATE",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ],
       "adaptiveIcon": {
-        "foregroundImage": "./icon.png",
+        "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.anonymous.magdarecords"
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "data": {
+            "scheme": "https"
+          },
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
     },
-    "web": {
-      "favicon": "./icon.png"
-    },
-    "extra": {
-      "eas": {
-        "projectId": "43b6bce8-80b7-4fd9-aa99-6ae794998c4f"
-      }
+    "ios": {
+      "bundleIdentifier": "com.anonymous.magdarecords",
+      "supportsTablet": true,
+      "buildNumber": "1.0.0"
     }
   }
 }
