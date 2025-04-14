@@ -1,4 +1,4 @@
-package com.anonymous.magdarecords
+package com.magdarecords
 
 import android.os.Build
 import android.os.Bundle
