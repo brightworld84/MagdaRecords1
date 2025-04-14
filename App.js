@@ -22,20 +22,26 @@ export default function App() {
   useEffect(() => {
     const prepare = async () => {
       try {
-        // Initialize secure storage and other services
-        await initializeStorage();
-        
-        // Initialize OpenAI with API key
-        const openAIInitialized = await initializeOpenAI();
-        if (openAIInitialized) {
-          console.log('OpenAI client initialized successfully');
-        } else {
-          console.warn('OpenAI client could not be initialized. AI features will use mock data.');
-        }
-        
-        // Wait a bit to ensure everything is loaded
+        // Temporarily disable storage and AI init for web
+        // await initializeStorage();
+        // const openAIInitialized = await initializeOpenAI();
+        // if (openAIInitialized) {
+        //   console.log('OpenAI client initialized successfully');
+        // } else {
+        //   console.warn('OpenAI client could not be initialized. AI features will use mock data.');
+        // }
+  
         await new Promise(resolve => setTimeout(resolve, 500));
       } catch (e) {
+        console.warn('Failed to initialize app:', e);
+      } finally {
+        setIsReady(true);
+      }
+    };
+  
+    prepare();
+  }, []);
+  
         console.warn('Failed to initialize app:', e);
       } finally {
         setIsReady(true);
