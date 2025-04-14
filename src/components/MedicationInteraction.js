@@ -7,9 +7,9 @@ import {
   Modal,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import colors from '../../theme/colors';
-import typography from '../../theme/typography';
-import spacing from '../../theme/spacing';
+import colors from '../theme/colors';
+import typography from '../theme/typography';
+import spacing from '../theme/spacing';
 
 const MedicationInteraction = ({ interaction }) => {
   const [modalVisible, setModalVisible] = useState(false);
