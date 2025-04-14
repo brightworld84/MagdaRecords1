@@ -1,16 +1,20 @@
 {
-    "expo": {
-      "name": "MagdaRecords",
-      "slug": "magda-records",
-      "version": "1.0.0",
-      "orientation": "portrait",
-      
-      "userInterfaceStyle": "light",
-      "splash": {
-        "image": "./generated-icon.png",
-        "resizeMode": "contain",
-        "backgroundColor": "#ffffff"
-      },
+  "expo": {
+    "name": "MagdaRecords",
+    "slug": "magdarecords",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./icon.png",
+    "splash": {
+      "image": "./icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "platforms": ["ios", "android", "web"],
+    "..."
+  },
+
+
       "assetBundlePatterns": [
         "**/*"
       ],
