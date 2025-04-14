@@ -4,60 +4,30 @@
     "slug": "magdarecords",
     "version": "1.0.0",
     "orientation": "portrait",
+    "platforms": ["ios", "android", "web"],
     "icon": "./icon.png",
     "splash": {
       "image": "./icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "platforms": ["ios", "android", "web"],
-    "..."
-  },
-
-
-      "assetBundlePatterns": [
-        "**/*"
-      ],
-      "ios": {
-        "supportsTablet": true,
-        "bundleIdentifier": "com.magdarecords.app",
-        "infoPlist": {
-          "NSFaceIDUsageDescription": "This app uses Face ID to securely access your medical records.",
-          "NSCameraUsageDescription": "This app uses the camera to capture and upload medical records.",
-          "NSPhotoLibraryUsageDescription": "This app accesses your photos to upload medical records."
-        }
-      },
-      "android": {
-        "adaptiveIcon": {
-          "foregroundImage": "./generated-icon.png",
-          "backgroundColor": "#ffffff"
-        },
-        "package": "com.magdarecords.app",
-        "permissions": [
-          "CAMERA",
-          "READ_EXTERNAL_STORAGE",
-          "WRITE_EXTERNAL_STORAGE",
-          "USE_BIOMETRIC",
-          "USE_FINGERPRINT"
-        ]
-      },
-      "web": {
-        "favicon": "./assets/logo.svg"
-      },
-      "plugins": [
-        [
-          "expo-local-authentication",
-          {
-            "faceIDPermission": "Allow MagdaRecords to use Face ID to securely access your medical records."
-          }
-        ],
-        [
-          "expo-image-picker",
-          {
-            "photosPermission": "The app accesses your photos to upload medical records."
-          }
-        ]
-      ]
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./icon.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "web": {
+      "favicon": "./icon.png"
     }
   }
-  
+}
