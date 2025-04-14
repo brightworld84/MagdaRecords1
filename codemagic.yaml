@@ -1,17 +1,34 @@
 workflows:
   expo-app:
-    name: Build Expo Android App
-    instance_type: linux_x2
+    name: Build MagdaRecords Android AAB
+    instance_type: mac_mini_m1  # Or use 'linux_x2' for Android only, cheaper
+    max_build_duration: 60
     environment:
-      node: 18.17.0
       vars:
-        EXPO_TOKEN: Encrypted_your_token_here
+        EXPO_PROJECT_ROOT: .
+      node: 18
+      expo: latest
+      java: 17
     scripts:
-      - npm install -g expo-cli
-      - npm ci
-      - expo login --token $EXPO_TOKEN
-      - expo install
-      - expo build:android --non-interactive
+      - name: Install dependencies
+        script: |
+          npm install
+
+      - name: Install Expo CLI
+        script: |
+          npm install -g expo-cli
+
+      - name: Create .aab file
+        script: |
+          eas build -p android --profile preview --non-interactive
+
     artifacts:
-      - /build/*.apk
-      - /build/**/*.apk
+      - build/**/*.aab
+      - build/**/*.apk
+    publishing:
+      email:
+        recipients:
+          - your@email.com
+        notify:
+          success: true
+          failure: true
