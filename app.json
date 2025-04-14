@@ -4,7 +4,11 @@
     "slug": "magdarecords",
     "version": "1.0.0",
     "orientation": "portrait",
-    "platforms": ["ios", "android", "web"],
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
     "icon": "./icon.png",
     "splash": {
       "image": "./icon.png",
@@ -18,13 +22,15 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.magdarecords"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.anonymous.magdarecords"
     },
     "web": {
       "favicon": "./icon.png"

@@ -1,4 +1,4 @@
-package com.magdarecords
+package com.anonymous.magdarecords
 
 import android.app.Application
 import android.content.res.Configuration
