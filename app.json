@@ -1,0 +1,59 @@
+{
+    "expo": {
+      "name": "MagdaRecords",
+      "slug": "magda-records",
+      "version": "1.0.0",
+      "orientation": "portrait",
+      "icon": "./generated-icon.png",
+      "userInterfaceStyle": "light",
+      "splash": {
+        "image": "./generated-icon.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#ffffff"
+      },
+      "assetBundlePatterns": [
+        "**/*"
+      ],
+      "ios": {
+        "supportsTablet": true,
+        "bundleIdentifier": "com.magdarecords.app",
+        "infoPlist": {
+          "NSFaceIDUsageDescription": "This app uses Face ID to securely access your medical records.",
+          "NSCameraUsageDescription": "This app uses the camera to capture and upload medical records.",
+          "NSPhotoLibraryUsageDescription": "This app accesses your photos to upload medical records."
+        }
+      },
+      "android": {
+        "adaptiveIcon": {
+          "foregroundImage": "./generated-icon.png",
+          "backgroundColor": "#ffffff"
+        },
+        "package": "com.magdarecords.app",
+        "permissions": [
+          "CAMERA",
+          "READ_EXTERNAL_STORAGE",
+          "WRITE_EXTERNAL_STORAGE",
+          "USE_BIOMETRIC",
+          "USE_FINGERPRINT"
+        ]
+      },
+      "web": {
+        "favicon": "./assets/logo.svg"
+      },
+      "plugins": [
+        [
+          "expo-local-authentication",
+          {
+            "faceIDPermission": "Allow MagdaRecords to use Face ID to securely access your medical records."
+          }
+        ],
+        [
+          "expo-image-picker",
+          {
+            "photosPermission": "The app accesses your photos to upload medical records."
+          }
+        ]
+      ]
+    }
+  }
+  
