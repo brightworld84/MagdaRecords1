@@ -244,14 +244,18 @@ const styles = StyleSheet.create({
     color: colors.primary,
   },
   recordsContainer: {
-    gap: spacing.medium,
-  },
+    // gap: spacing.medium,
+    marginBottom: spacing.medium,
+  },  
   interactionsContainer: {
-    gap: spacing.medium,
+    // gap: spacing.medium,
+    marginBottom: spacing.medium,
   },
+  
   recommendationsContainer: {
-    gap: spacing.medium,
-  },
+    // gap: spacing.medium,
+    marginBottom: spacing.medium,
+  },  
   emptyStateContainer: {
     flex: 1,
     justifyContent: 'center',
