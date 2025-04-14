@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+// other imports...
 import {
   View,
   Text,
@@ -359,41 +361,3 @@ const styles = StyleSheet.create({
 });
 
 export default HealthRecommendation;
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import colors from '../theme/colors';
-import typography from '../theme/typography';
-
-export default function HealthRecommendation({ recommendation }) {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>{recommendation.title}</Text>
-      <Text style={styles.description}>{recommendation.description}</Text>
-      {recommendation.action && (
-        <Text style={styles.action}>{recommendation.action}</Text>
-      )}
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: colors.surface,
-    padding: 16,
-    borderRadius: 8,
-    marginVertical: 8,
-  },
-  title: {
-    ...typography.subtitle,
-    color: colors.primary,
-    marginBottom: 8,
-  },
-  description: {
-    ...typography.body,
-    marginBottom: 8,
-  },
-  action: {
-    ...typography.bodySmall,
-    color: colors.secondary,
-  },
-});
