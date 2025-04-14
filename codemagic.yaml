@@ -1,7 +1,7 @@
 workflows:
   expo-app:
-    name: Build Expo App
-    instance_type: mac_mini
+    name: Build Expo Android App
+    instance_type: linux_x2
     environment:
       node: 18.17.0
       vars:
@@ -15,5 +15,3 @@ workflows:
     artifacts:
       - /build/*.apk
       - /build/**/*.apk
-      - /build/*.ipa
-      - /build/**/*.ipa
