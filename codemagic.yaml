@@ -1,17 +1,19 @@
 workflows:
-
-    android-workflow-id:
-
-        name: Android Sample Workflow
-
-        # .......    
-
-        # .......
-
-        # .......  
-
-    ios-workflow-id:
-
-        name: iOS Sample Workflow
-
-        # ......
+  expo-app:
+    name: Build Expo App
+    instance_type: mac_mini
+    environment:
+      node: 18.17.0
+      vars:
+        EXPO_TOKEN: Encrypted_your_token_here
+    scripts:
+      - npm install -g expo-cli
+      - npm ci
+      - expo login --token $EXPO_TOKEN
+      - expo install
+      - expo build:android --non-interactive
+    artifacts:
+      - /build/*.apk
+      - /build/**/*.apk
+      - /build/*.ipa
+      - /build/**/*.ipa
