@@ -9,7 +9,7 @@
       "distribution": "internal"
     },
     "preview": {
-      "distribution": "app-store",
+      "distribution": "store",
       "ios": {
         "simulator": false
       }
