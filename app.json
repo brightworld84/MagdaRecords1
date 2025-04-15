@@ -47,7 +47,10 @@
     "ios": {
       "bundleIdentifier": "com.anonymous.magdarecords",
       "supportsTablet": true,
-      "buildNumber": "1.0.0"
+      "buildNumber": "1.0.0",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "extra": {
       "eas": {
