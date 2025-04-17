@@ -1,27 +1,32 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity, 
-  SafeAreaView, 
+import React, { useContext, useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  SafeAreaView,
   Alert,
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
-  ScrollView
+  ScrollView,
 } from 'react-native';
 import { Ionicons, FontAwesome } from '@expo/vector-icons';
 import * as LocalAuthentication from 'expo-local-authentication';
 import { AuthContext } from '../services/auth';
+import { ThemeContext } from '../theme/themeContext';
 import colors from '../theme/colors';
+import darkColors from '../theme/darkColors';
 import typography from '../theme/typography';
 
 const LandingScreen = ({ navigation }) => {
   const { login, tryLocalAuth } = useContext(AuthContext);
+  const { isDarkMode } = useContext(ThemeContext);
+  const themedColors = isDarkMode ? darkColors : colors;
+
   const [isLoading, setIsLoading] = useState(false);
   const [isBiometricAvailable, setIsBiometricAvailable] = useState(false);
-  
+
   useEffect(() => {
     (async () => {
       const compatible = await LocalAuthentication.hasHardwareAsync();
@@ -30,32 +35,10 @@ const LandingScreen = ({ navigation }) => {
     })();
   }, []);
 
-  const handleGoogleLogin = async () => {
+  const handleAuth = async (provider) => {
     setIsLoading(true);
     try {
-      await login('email@example.com', 'password', 'google');
-    } catch (error) {
-      Alert.alert('Login Failed', error.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleAppleLogin = async () => {
-    setIsLoading(true);
-    try {
-      await login('email@example.com', 'password', 'apple');
-    } catch (error) {
-      Alert.alert('Login Failed', error.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleEmailLogin = async () => {
-    setIsLoading(true);
-    try {
-      await login('email@example.com', 'password', 'email');
+      await login('email@example.com', 'password', provider);
     } catch (error) {
       Alert.alert('Login Failed', error.message);
     } finally {
@@ -89,37 +72,35 @@ const LandingScreen = ({ navigation }) => {
     }
   };
 
-  const handleSignUp = () => {
-    navigation.navigate('SignUp');
-  };
-
   if (isLoading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={colors.primary} />
-        <Text style={styles.loadingText}>Authenticating...</Text>
+      <View style={[styles.loadingContainer, { backgroundColor: themedColors.background }]}>
+        <ActivityIndicator size="large" color={themedColors.primary} />
+        <Text style={[styles.loadingText, { color: themedColors.text }]}>Authenticating...</Text>
       </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: themedColors.background }]}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1 }}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
       >
-        <ScrollView
-          contentContainerStyle={styles.content}
-          keyboardShouldPersistTaps="handled"
-        >
+        <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
           <View style={styles.logoContainer}>
-            <Text style={styles.logo}>MagdaRecords</Text>
-            <Text style={styles.tagline}>Secure Medical Records at Your Fingertips</Text>
+            <Text style={[styles.logo, { color: themedColors.primary }]}>MagdaRecords</Text>
+            <Text style={[styles.tagline, { color: themedColors.secondaryText }]}>
+              Secure Medical Records at Your Fingertips
+            </Text>
           </View>
 
           <View style={styles.authContainer}>
-            <TouchableOpacity style={styles.googleButton} onPress={handleGoogleLogin}>
+            <TouchableOpacity
+              style={[styles.googleButton, { borderColor: themedColors.lightGray, backgroundColor: themedColors.white }]}
+              onPress={() => handleAuth('google')}
+            >
               <View style={styles.googleIconContainer}>
                 <View style={styles.googleIconWrapper}>
                   <View style={[styles.googlePart, { backgroundColor: '#4285F4' }]} />
@@ -128,35 +109,44 @@ const LandingScreen = ({ navigation }) => {
                   <View style={[styles.googlePart, { backgroundColor: '#34A853' }]} />
                 </View>
               </View>
-              <Text style={styles.buttonText}>Continue with Google</Text>
+              <Text style={[styles.buttonText, { color: themedColors.text }]}>Continue with Google</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.appleButton} onPress={handleAppleLogin}>
-              <FontAwesome name="apple" size={24} color={colors.white} />
-              <Text style={[styles.buttonText, styles.appleButtonText]}>Continue with Apple</Text>
+            <TouchableOpacity
+              style={[styles.appleButton, { backgroundColor: themedColors.black }]}
+              onPress={() => handleAuth('apple')}
+            >
+              <FontAwesome name="apple" size={24} color={themedColors.white} />
+              <Text style={[styles.buttonText, { color: themedColors.white }]}>Continue with Apple</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.emailButton} onPress={handleEmailLogin}>
-              <Ionicons name="mail-outline" size={22} color={colors.primary} />
-              <Text style={[styles.buttonText, styles.emailButtonText]}>Login with Email</Text>
+            <TouchableOpacity
+              style={[styles.emailButton, { borderColor: themedColors.primary, backgroundColor: themedColors.white }]}
+              onPress={() => handleAuth('email')}
+            >
+              <Ionicons name="mail-outline" size={22} color={themedColors.primary} />
+              <Text style={[styles.buttonText, { color: themedColors.primary }]}>Login with Email</Text>
             </TouchableOpacity>
 
             {isBiometricAvailable && (
-              <TouchableOpacity style={styles.biometricButton} onPress={handleBiometricAuth}>
-                <Ionicons name="finger-print" size={22} color={colors.primary} />
-                <Text style={[styles.buttonText, styles.emailButtonText]}>Login with Biometrics</Text>
+              <TouchableOpacity
+                style={[styles.biometricButton, { borderColor: themedColors.primary, backgroundColor: themedColors.white }]}
+                onPress={handleBiometricAuth}
+              >
+                <Ionicons name="finger-print" size={22} color={themedColors.primary} />
+                <Text style={[styles.buttonText, { color: themedColors.primary }]}>Login with Biometrics</Text>
               </TouchableOpacity>
             )}
           </View>
 
           <View style={styles.signUpContainer}>
-            <Text style={styles.signUpText}>Don't have an account?</Text>
-            <TouchableOpacity onPress={handleSignUp}>
-              <Text style={styles.signUpLink}>Sign Up</Text>
+            <Text style={[styles.signUpText, { color: themedColors.text }]}>Don't have an account?</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
+              <Text style={[styles.signUpLink, { color: themedColors.primary }]}>Sign Up</Text>
             </TouchableOpacity>
           </View>
 
-          <Text style={styles.privacyText}>
+          <Text style={[styles.privacyText, { color: themedColors.secondaryText }]}>
             By signing in, you agree to our Terms of Service and Privacy Policy.
             Your data is encrypted and HIPAA compliant.
           </Text>
@@ -169,7 +159,6 @@ const LandingScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.white,
   },
   content: {
     flexGrow: 1,
@@ -182,12 +171,10 @@ const styles = StyleSheet.create({
   },
   logo: {
     ...typography.h1,
-    color: colors.primary,
     marginBottom: 10,
   },
   tagline: {
     ...typography.subtitle,
-    color: colors.secondaryText,
     textAlign: 'center',
   },
   authContainer: {
@@ -196,18 +183,12 @@ const styles = StyleSheet.create({
   googleButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.white,
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 8,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: colors.lightGray,
     elevation: 1,
-    shadowColor: colors.black,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 1,
   },
   googleIconContainer: {
     marginRight: 10,
@@ -230,43 +211,27 @@ const styles = StyleSheet.create({
   appleButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.black,
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 8,
     marginBottom: 16,
-    elevation: 1,
-    shadowColor: colors.black,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1,
-  },
-  appleButtonText: {
-    color: colors.white,
   },
   emailButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.white,
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 8,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: colors.primary,
   },
   biometricButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.white,
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: colors.primary,
-  },
-  emailButtonText: {
-    color: colors.primary,
   },
   buttonText: {
     ...typography.button,
@@ -279,28 +244,23 @@ const styles = StyleSheet.create({
   },
   signUpText: {
     ...typography.body,
-    color: colors.text,
   },
   signUpLink: {
     ...typography.body,
-    color: colors.primary,
     fontWeight: 'bold',
     marginLeft: 5,
   },
   privacyText: {
     ...typography.small,
-    color: colors.secondaryText,
     textAlign: 'center',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: colors.white,
   },
   loadingText: {
     ...typography.body,
-    color: colors.text,
     marginTop: 10,
   },
 });

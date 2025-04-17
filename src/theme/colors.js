@@ -1,6 +1,5 @@
 // src/theme/colors.js
 
-// Color palette for the application
 const colors = {
   // Primary colors
   primary: '#2B6CB0',
@@ -33,12 +32,6 @@ const colors = {
   warning: '#DD6B20',
   success: '#38A169',
   info: '#3182CE',
-
-  // Dark mode colors (for future)
-  darkModeBg: '#1A202C',
-  darkModeText: '#F7FAFC',
-  darkModeSecondaryText: '#CBD5E0',
-  darkModeBorder: '#2D3748',
 
   // Specific use case
   cardBg: '#FFFFFF',
