@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Modal,
   ScrollView,
+  Alert,
 } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { ThemeContext } from '../theme/themeContext';
@@ -38,18 +39,12 @@ const RecordCard = ({ record, onDelete }) => {
 
   const getTypeLabel = (type) => {
     switch (type) {
-      case 'lab':
-        return 'Lab Results';
-      case 'imaging':
-        return 'Imaging';
-      case 'visit':
-        return 'Visit Summary';
-      case 'prescription':
-        return 'Prescription';
-      case 'immunization':
-        return 'Immunization';
-      default:
-        return 'Document';
+      case 'lab': return 'Lab Results';
+      case 'imaging': return 'Imaging';
+      case 'visit': return 'Visit Summary';
+      case 'prescription': return 'Prescription';
+      case 'immunization': return 'Immunization';
+      default: return 'Document';
     }
   };
 
@@ -58,11 +53,24 @@ const RecordCard = ({ record, onDelete }) => {
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
-  const handleDelete = () => {
-    setModalVisible(false);
-    if (onDelete) {
-      onDelete(record.id);
-    }
+  const confirmDelete = () => {
+    Alert.alert(
+      'Delete Record',
+      'Are you sure you want to delete this record?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => {
+            if (onDelete) {
+              onDelete(record.id);
+            }
+          },
+        },
+      ],
+      { cancelable: true }
+    );
   };
 
   const handleView = () => {
@@ -152,7 +160,10 @@ const RecordCard = ({ record, onDelete }) => {
         </View>
       )}
 
-      {/* Modal unchanged — if you want dark mode inside modal, I can update that too */}
+      {/* Add more modal or buttons here as needed */}
+      <TouchableOpacity onPress={confirmDelete} style={{ marginTop: spacing.medium }}>
+        <Text style={{ color: themedColors.error, fontWeight: 'bold' }}>Delete</Text>
+      </TouchableOpacity>
     </TouchableOpacity>
   );
 };

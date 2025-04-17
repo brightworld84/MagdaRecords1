@@ -4,6 +4,7 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { ThemeContext } from '../theme/themeContext';
@@ -24,6 +25,24 @@ const ProviderCard = ({ provider, onEdit, onDelete }) => {
     }
   };
 
+  const confirmDelete = () => {
+    Alert.alert(
+      'Delete Provider',
+      `Are you sure you want to delete ${provider.name}?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => {
+            if (onDelete) onDelete(provider.id);
+          },
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: theme.white, shadowColor: theme.black }]}>
       <View style={styles.header}>
@@ -41,7 +60,7 @@ const ProviderCard = ({ provider, onEdit, onDelete }) => {
             <Ionicons name="create-outline" size={22} color={theme.primary} />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.actionButton} onPress={onDelete}>
+          <TouchableOpacity style={styles.actionButton} onPress={confirmDelete}>
             <Ionicons name="trash-outline" size={22} color={theme.error} />
           </TouchableOpacity>
         </View>
