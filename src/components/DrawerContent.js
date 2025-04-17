@@ -13,12 +13,17 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { AuthContext } from '../services/auth';
 import { getLinkedAccounts } from '../services/storage';
+import { ThemeContext } from '../theme/themeContext';
 import colors from '../theme/colors';
+import darkColors from '../theme/darkColors';
 import typography from '../theme/typography';
 import spacing from '../theme/spacing';
 
 const DrawerContent = (props) => {
   const { state, logout } = useContext(AuthContext);
+  const { isDarkMode } = useContext(ThemeContext);
+  const theme = isDarkMode ? darkColors : colors;
+
   const [linkedAccounts, setLinkedAccounts] = useState([]);
   const [showLinkedAccounts, setShowLinkedAccounts] = useState(false);
 
@@ -28,7 +33,7 @@ const DrawerContent = (props) => {
 
   const loadLinkedAccounts = async () => {
     try {
-      if (state.user && state.user.id) {
+      if (state.user?.id) {
         const accounts = await getLinkedAccounts(state.user.id);
         setLinkedAccounts(accounts);
       }
@@ -42,51 +47,50 @@ const DrawerContent = (props) => {
   };
 
   return (
-    <DrawerContentScrollView {...props} contentContainerStyle={styles.container}>
-      <View style={styles.header}>
+    <DrawerContentScrollView {...props} contentContainerStyle={[styles.container, { backgroundColor: theme.background }]}>
+      <View style={[styles.header, { backgroundColor: theme.primaryLight }]}>
         <View style={styles.userInfoSection}>
           <View style={styles.avatarContainer}>
-            <View style={styles.avatar}>
-              <Text style={styles.avatarText}>
+            <View style={[styles.avatar, { backgroundColor: theme.primary }]}>
+              <Text style={[styles.avatarText, { color: theme.white }]}>
                 {getInitials(state.user?.firstName, state.user?.lastName)}
               </Text>
             </View>
           </View>
           <View style={styles.userDetails}>
-            <Text style={styles.userName}>
+            <Text style={[styles.userName, { color: theme.text }]}>
               {state.user?.firstName} {state.user?.lastName}
             </Text>
-            <Text style={styles.userEmail}>{state.user?.email}</Text>
+            <Text style={[styles.userEmail, { color: theme.secondaryText }]}>
+              {state.user?.email}
+            </Text>
           </View>
         </View>
 
         {linkedAccounts.length > 0 && (
           <View style={styles.linkedAccountsSection}>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.linkedAccountsHeader}
               onPress={() => setShowLinkedAccounts(!showLinkedAccounts)}
             >
-              <Text style={styles.linkedAccountsTitle}>Family Accounts</Text>
-              <Ionicons 
-                name={showLinkedAccounts ? "chevron-up" : "chevron-down"} 
-                size={20} 
-                color={colors.text} 
+              <Text style={[styles.linkedAccountsTitle, { color: theme.text }]}>Family Accounts</Text>
+              <Ionicons
+                name={showLinkedAccounts ? 'chevron-up' : 'chevron-down'}
+                size={20}
+                color={theme.text}
               />
             </TouchableOpacity>
-            
+
             {showLinkedAccounts && (
               <View style={styles.linkedAccountsList}>
                 {linkedAccounts.map((account) => (
-                  <TouchableOpacity 
-                    key={account.id}
-                    style={styles.linkedAccountItem}
-                  >
-                    <View style={styles.linkedAccountAvatar}>
-                      <Text style={styles.linkedAccountAvatarText}>
+                  <TouchableOpacity key={account.id} style={styles.linkedAccountItem}>
+                    <View style={[styles.linkedAccountAvatar, { backgroundColor: theme.accent }]}>
+                      <Text style={[styles.linkedAccountAvatarText, { color: theme.white }]}>
                         {getInitials(account.firstName, account.lastName)}
                       </Text>
                     </View>
-                    <Text style={styles.linkedAccountName}>
+                    <Text style={[styles.linkedAccountName, { color: theme.text }]}>
                       {account.firstName} {account.lastName}
                     </Text>
                   </TouchableOpacity>
@@ -101,13 +105,10 @@ const DrawerContent = (props) => {
         <DrawerItemList {...props} />
       </View>
 
-      <View style={styles.footer}>
-        <TouchableOpacity
-          style={styles.logoutButton}
-          onPress={() => logout()}
-        >
-          <Ionicons name="log-out-outline" size={24} color={colors.error} />
-          <Text style={styles.logoutButtonText}>Logout</Text>
+      <View style={[styles.footer, { borderTopColor: theme.lightGray }]}>
+        <TouchableOpacity style={styles.logoutButton} onPress={() => logout()}>
+          <Ionicons name="log-out-outline" size={24} color={theme.error} />
+          <Text style={[styles.logoutButtonText, { color: theme.error }]}>Logout</Text>
         </TouchableOpacity>
       </View>
     </DrawerContentScrollView>
@@ -119,7 +120,6 @@ const styles = StyleSheet.create({
   header: {
     paddingTop: spacing.large,
     paddingBottom: spacing.medium,
-    backgroundColor: colors.primaryLight,
   },
   userInfoSection: {
     flexDirection: 'row',
@@ -127,28 +127,28 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.medium,
     alignItems: 'center',
   },
-  avatarContainer: { marginRight: spacing.medium },
+  avatarContainer: {
+    marginRight: spacing.medium,
+  },
   avatar: {
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
   },
   avatarText: {
     ...typography.h2,
-    color: colors.white,
   },
-  userDetails: { flex: 1 },
+  userDetails: {
+    flex: 1,
+  },
   userName: {
     ...typography.h3,
-    color: colors.text,
     marginBottom: spacing.extraSmall,
   },
   userEmail: {
     ...typography.body,
-    color: colors.secondaryText,
   },
   linkedAccountsSection: {
     paddingHorizontal: spacing.medium,
@@ -162,9 +162,10 @@ const styles = StyleSheet.create({
   },
   linkedAccountsTitle: {
     ...typography.subtitle,
-    color: colors.text,
   },
-  linkedAccountsList: { marginTop: spacing.small },
+  linkedAccountsList: {
+    marginTop: spacing.small,
+  },
   linkedAccountItem: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -174,18 +175,15 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: colors.accent,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: spacing.small,
   },
   linkedAccountAvatarText: {
     ...typography.subtitle,
-    color: colors.white,
   },
   linkedAccountName: {
     ...typography.body,
-    color: colors.text,
   },
   drawerItems: {
     flex: 1,
@@ -195,7 +193,6 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.large,
     alignItems: 'center',
     borderTopWidth: 1,
-    borderTopColor: colors.lightGray,
     marginTop: spacing.medium,
   },
   logoutButton: {
@@ -205,7 +202,6 @@ const styles = StyleSheet.create({
   },
   logoutButtonText: {
     ...typography.button,
-    color: colors.error,
     marginLeft: spacing.small,
   },
 });

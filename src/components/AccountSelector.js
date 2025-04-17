@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import {
   View,
   Text,
@@ -9,22 +9,23 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '../theme/colors';
+import darkColors from '../theme/darkColors';
 import typography from '../theme/typography';
 import spacing from '../theme/spacing';
+import { ThemeContext } from '../theme/themeContext';
 
 const AccountSelector = ({ accounts, selectedAccount, onSelectAccount }) => {
   const [modalVisible, setModalVisible] = useState(false);
+  const { isDarkMode } = useContext(ThemeContext);
+  const theme = isDarkMode ? darkColors : colors;
 
-  // Find the currently selected account object
   const currentAccount = accounts.find(acc => acc.id === selectedAccount) || accounts[0];
   
   const getInitials = (firstName, lastName) => {
     return `${firstName ? firstName.charAt(0) : ''}${lastName ? lastName.charAt(0) : ''}`;
   };
 
-  const toggleModal = () => {
-    setModalVisible(!modalVisible);
-  };
+  const toggleModal = () => setModalVisible(!modalVisible);
 
   const handleSelectAccount = (accountId) => {
     onSelectAccount(accountId);
@@ -36,22 +37,22 @@ const AccountSelector = ({ accounts, selectedAccount, onSelectAccount }) => {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.card, borderBottomColor: theme.lightGray }]}>
       <TouchableOpacity style={styles.selector} onPress={toggleModal}>
         <View style={styles.selectedAccount}>
-          <View style={styles.avatarContainer}>
-            <Text style={styles.avatarText}>
+          <View style={[styles.avatarContainer, { backgroundColor: theme.primary }]}>
+            <Text style={[styles.avatarText, { color: theme.white }]}>
               {currentAccount ? getInitials(currentAccount.name.split(' ')[0], currentAccount.name.split(' ')[1]) : ''}
             </Text>
           </View>
-          <Text style={styles.accountName}>{currentAccount ? currentAccount.name : ''}</Text>
+          <Text style={[styles.accountName, { color: theme.text }]}>{currentAccount ? currentAccount.name : ''}</Text>
         </View>
-        <Ionicons name="chevron-down" size={20} color={colors.text} />
+        <Ionicons name="chevron-down" size={20} color={theme.text} />
       </TouchableOpacity>
-      
+
       <Modal
         visible={modalVisible}
-        transparent={true}
+        transparent
         animationType="fade"
         onRequestClose={toggleModal}
       >
@@ -60,32 +61,32 @@ const AccountSelector = ({ accounts, selectedAccount, onSelectAccount }) => {
           activeOpacity={1} 
           onPress={toggleModal}
         >
-          <View style={styles.modalContainer}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Select Account</Text>
+          <View style={[styles.modalContainer, { backgroundColor: theme.card, shadowColor: theme.black }]}>
+            <View style={[styles.modalHeader, { borderBottomColor: theme.lightGray }]}>
+              <Text style={[styles.modalTitle, { color: theme.text }]}>Select Account</Text>
               <TouchableOpacity onPress={toggleModal}>
-                <Ionicons name="close" size={24} color={colors.text} />
+                <Ionicons name="close" size={24} color={theme.text} />
               </TouchableOpacity>
             </View>
-            
+
             <ScrollView style={styles.accountsList}>
               {accounts.map((account) => (
                 <TouchableOpacity
                   key={account.id}
                   style={[
                     styles.accountItem,
-                    selectedAccount === account.id && styles.selectedAccountItem
+                    selectedAccount === account.id && { backgroundColor: theme.primaryLight }
                   ]}
                   onPress={() => handleSelectAccount(account.id)}
                 >
                   <View style={styles.accountItemContent}>
                     <View style={[
                       styles.accountAvatar,
-                      selectedAccount === account.id && styles.selectedAccountAvatar
+                      { backgroundColor: selectedAccount === account.id ? theme.primary : theme.lightGray }
                     ]}>
                       <Text style={[
                         styles.accountAvatarText,
-                        selectedAccount === account.id && styles.selectedAccountAvatarText
+                        { color: selectedAccount === account.id ? theme.white : theme.text }
                       ]}>
                         {getInitials(account.name.split(' ')[0], account.name.split(' ')[1])}
                       </Text>
@@ -93,20 +94,20 @@ const AccountSelector = ({ accounts, selectedAccount, onSelectAccount }) => {
                     <View style={styles.accountDetails}>
                       <Text style={[
                         styles.accountItemName,
-                        selectedAccount === account.id && styles.selectedAccountItemName
+                        { color: selectedAccount === account.id ? theme.primary : theme.text }
                       ]}>
                         {account.name}
                       </Text>
                       {account.relationship && (
-                        <Text style={styles.accountRelationship}>
+                        <Text style={[styles.accountRelationship, { color: theme.secondaryText }]}>
                           {account.relationship}
                         </Text>
                       )}
                     </View>
                   </View>
-                  
+
                   {selectedAccount === account.id && (
-                    <Ionicons name="checkmark" size={24} color={colors.primary} />
+                    <Ionicons name="checkmark" size={24} color={theme.primary} />
                   )}
                 </TouchableOpacity>
               ))}
@@ -120,9 +121,7 @@ const AccountSelector = ({ accounts, selectedAccount, onSelectAccount }) => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: colors.white,
     borderBottomWidth: 1,
-    borderBottomColor: colors.lightGray,
     paddingHorizontal: spacing.medium,
     paddingVertical: spacing.small,
   },
@@ -139,7 +138,6 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: spacing.small,
@@ -147,11 +145,9 @@ const styles = StyleSheet.create({
   avatarText: {
     ...typography.subtitle,
     fontSize: 14,
-    color: colors.white,
   },
   accountName: {
     ...typography.subtitle,
-    color: colors.text,
   },
   modalOverlay: {
     flex: 1,
@@ -160,12 +156,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContainer: {
-    backgroundColor: colors.white,
     borderRadius: 12,
     width: '80%',
     maxHeight: '60%',
     elevation: 5,
-    shadowColor: colors.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
@@ -176,11 +170,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: spacing.medium,
     borderBottomWidth: 1,
-    borderBottomColor: colors.lightGray,
   },
   modalTitle: {
     ...typography.h3,
-    color: colors.text,
   },
   accountsList: {
     padding: spacing.small,
@@ -192,9 +184,6 @@ const styles = StyleSheet.create({
     padding: spacing.medium,
     borderRadius: 8,
   },
-  selectedAccountItem: {
-    backgroundColor: colors.primaryLight,
-  },
   accountItemContent: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -204,35 +193,22 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: colors.lightGray,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: spacing.medium,
   },
-  selectedAccountAvatar: {
-    backgroundColor: colors.primary,
-  },
   accountAvatarText: {
     ...typography.body,
     fontWeight: 'bold',
-    color: colors.text,
-  },
-  selectedAccountAvatarText: {
-    color: colors.white,
   },
   accountDetails: {
     flex: 1,
   },
   accountItemName: {
     ...typography.subtitle,
-    color: colors.text,
-  },
-  selectedAccountItemName: {
-    color: colors.primary,
   },
   accountRelationship: {
     ...typography.small,
-    color: colors.secondaryText,
   },
 });
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import {
   View,
   Text,
@@ -6,13 +6,17 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { ThemeContext } from '../theme/themeContext';
 import colors from '../theme/colors';
+import darkColors from '../theme/darkColors';
 import typography from '../theme/typography';
 import spacing from '../theme/spacing';
 
 const ProviderCard = ({ provider, onEdit, onDelete }) => {
+  const { isDarkMode } = useContext(ThemeContext);
+  const theme = isDarkMode ? darkColors : colors;
+
   const handleCall = () => {
-    // In a real app, this would use Linking to make a phone call
     if (provider.phone) {
       alert(`Calling ${provider.name} at ${provider.phone}`);
     } else {
@@ -21,74 +25,72 @@ const ProviderCard = ({ provider, onEdit, onDelete }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.white, shadowColor: theme.black }]}>
       <View style={styles.header}>
         <View style={styles.nameContainer}>
-          <Text style={styles.name}>{provider.name}</Text>
+          <Text style={[styles.name, { color: theme.text }]}>{provider.name}</Text>
           {provider.specialty && (
-            <Text style={styles.specialty}>{provider.specialty}</Text>
+            <Text style={[styles.specialty, { color: theme.secondaryText }]}>
+              {provider.specialty}
+            </Text>
           )}
         </View>
-        
+
         <View style={styles.actions}>
-          <TouchableOpacity
-            style={styles.actionButton}
-            onPress={onEdit}
-          >
-            <Ionicons name="create-outline" size={22} color={colors.primary} />
+          <TouchableOpacity style={styles.actionButton} onPress={onEdit}>
+            <Ionicons name="create-outline" size={22} color={theme.primary} />
           </TouchableOpacity>
-          
-          <TouchableOpacity
-            style={styles.actionButton}
-            onPress={onDelete}
-          >
-            <Ionicons name="trash-outline" size={22} color={colors.error} />
+
+          <TouchableOpacity style={styles.actionButton} onPress={onDelete}>
+            <Ionicons name="trash-outline" size={22} color={theme.error} />
           </TouchableOpacity>
         </View>
       </View>
-      
+
       {provider.facility && (
         <View style={styles.infoRow}>
-          <MaterialIcons name="business" size={16} color={colors.secondaryText} />
-          <Text style={styles.infoText}>{provider.facility}</Text>
+          <MaterialIcons name="business" size={16} color={theme.secondaryText} />
+          <Text style={[styles.infoText, { color: theme.text }]}>{provider.facility}</Text>
         </View>
       )}
-      
+
       {provider.phone && (
         <TouchableOpacity style={styles.infoRow} onPress={handleCall}>
-          <Ionicons name="call-outline" size={16} color={colors.secondaryText} />
-          <Text style={[styles.infoText, styles.phoneText]}>{provider.phone}</Text>
+          <Ionicons name="call-outline" size={16} color={theme.secondaryText} />
+          <Text style={[styles.infoText, styles.phoneText, { color: theme.primary }]}>
+            {provider.phone}
+          </Text>
         </TouchableOpacity>
       )}
-      
+
       {provider.address && (
         <View style={styles.infoRow}>
-          <Ionicons name="location-outline" size={16} color={colors.secondaryText} />
-          <Text style={styles.infoText}>{provider.address}</Text>
+          <Ionicons name="location-outline" size={16} color={theme.secondaryText} />
+          <Text style={[styles.infoText, { color: theme.text }]}>{provider.address}</Text>
         </View>
       )}
-      
+
       {provider.notes && (
-        <View style={styles.notesContainer}>
-          <Text style={styles.notesLabel}>Notes:</Text>
-          <Text style={styles.notesText}>{provider.notes}</Text>
+        <View style={[styles.notesContainer, { backgroundColor: theme.lightBackground }]}>
+          <Text style={[styles.notesLabel, { color: theme.text }]}>Notes:</Text>
+          <Text style={[styles.notesText, { color: theme.text }]}>{provider.notes}</Text>
         </View>
       )}
-      
-      <View style={styles.footer}>
+
+      <View style={[styles.footer, { borderTopColor: theme.lightGray }]}>
         <TouchableOpacity style={styles.footerButton} onPress={handleCall}>
-          <Ionicons name="call-outline" size={20} color={colors.primary} />
-          <Text style={styles.footerButtonText}>Call</Text>
+          <Ionicons name="call-outline" size={20} color={theme.primary} />
+          <Text style={[styles.footerButtonText, { color: theme.primary }]}>Call</Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity style={styles.footerButton}>
-          <MaterialIcons name="directions" size={20} color={colors.primary} />
-          <Text style={styles.footerButtonText}>Directions</Text>
+          <MaterialIcons name="directions" size={20} color={theme.primary} />
+          <Text style={[styles.footerButtonText, { color: theme.primary }]}>Directions</Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity style={styles.footerButton} onPress={onEdit}>
-          <Ionicons name="create-outline" size={20} color={colors.primary} />
-          <Text style={styles.footerButtonText}>Edit</Text>
+          <Ionicons name="create-outline" size={20} color={theme.primary} />
+          <Text style={[styles.footerButtonText, { color: theme.primary }]}>Edit</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -97,11 +99,9 @@ const ProviderCard = ({ provider, onEdit, onDelete }) => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: colors.white,
     borderRadius: 8,
     padding: spacing.medium,
     elevation: 1,
-    shadowColor: colors.black,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 1,
@@ -116,12 +116,10 @@ const styles = StyleSheet.create({
   },
   name: {
     ...typography.h3,
-    color: colors.text,
     marginBottom: spacing.extraSmall,
   },
   specialty: {
     ...typography.body,
-    color: colors.secondaryText,
   },
   actions: {
     flexDirection: 'row',
@@ -136,35 +134,30 @@ const styles = StyleSheet.create({
   },
   infoText: {
     ...typography.body,
-    color: colors.text,
     marginLeft: spacing.small,
     flex: 1,
   },
   phoneText: {
-    color: colors.primary,
+    fontWeight: 'bold',
   },
   notesContainer: {
     marginTop: spacing.small,
-    backgroundColor: colors.lightBackground,
     padding: spacing.medium,
     borderRadius: 8,
   },
   notesLabel: {
     ...typography.label,
-    color: colors.text,
     marginBottom: spacing.extraSmall,
   },
   notesText: {
     ...typography.body,
-    color: colors.text,
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    borderTopWidth: 1,
-    borderTopColor: colors.lightGray,
     marginTop: spacing.medium,
     paddingTop: spacing.medium,
+    borderTopWidth: 1,
   },
   footerButton: {
     flexDirection: 'row',
@@ -172,7 +165,6 @@ const styles = StyleSheet.create({
   },
   footerButtonText: {
     ...typography.button,
-    color: colors.primary,
     marginLeft: spacing.extraSmall,
   },
 });

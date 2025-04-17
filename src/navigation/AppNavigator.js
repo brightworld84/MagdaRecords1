@@ -19,9 +19,11 @@ import SettingsScreen from '../screens/SettingsScreen';
 // Components
 import DrawerContent from '../components/DrawerContent';
 
-// Auth context
+// Contexts and Theme
 import { AuthContext } from '../services/auth';
+import { ThemeContext } from '../theme/themeContext';
 import colors from '../theme/colors';
+import darkColors from '../theme/darkColors';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -34,18 +36,18 @@ const AuthStack = () => (
   </Stack.Navigator>
 );
 
-const MainTabs = () => (
+const MainTabs = ({ theme }) => (
   <Tab.Navigator
     screenOptions={{
-      tabBarActiveTintColor: colors.primary,
-      tabBarInactiveTintColor: colors.gray,
+      tabBarActiveTintColor: theme.primary,
+      tabBarInactiveTintColor: theme.gray,
       tabBarLabelStyle: {
         fontSize: 12,
         fontWeight: '500',
       },
       tabBarStyle: {
-        backgroundColor: colors.white,
-        borderTopColor: colors.lightGray,
+        backgroundColor: theme.card,
+        borderTopColor: theme.lightGray,
         paddingTop: 5,
         height: 60,
       },
@@ -100,35 +102,36 @@ const MainTabs = () => (
   </Tab.Navigator>
 );
 
-const MainDrawer = () => (
+const MainDrawer = ({ theme }) => (
   <Drawer.Navigator
     drawerContent={(props) => <DrawerContent {...props} />}
     screenOptions={{
       headerStyle: {
-        backgroundColor: colors.white,
+        backgroundColor: theme.card,
         elevation: 0,
         shadowOpacity: 0,
         borderBottomWidth: 1,
-        borderBottomColor: colors.lightGray,
+        borderBottomColor: theme.lightGray,
       },
-      headerTintColor: colors.text,
+      headerTintColor: theme.text,
       headerTitleStyle: {
         fontWeight: 'bold',
       },
       drawerStyle: {
-        backgroundColor: colors.white,
+        backgroundColor: theme.card,
         width: 280,
       },
     }}
   >
     <Drawer.Screen 
       name="MainTabs" 
-      component={MainTabs} 
       options={{ 
         title: 'MagdaRecords',
         headerTitleAlign: 'center',
       }}
-    />
+    >
+      {() => <MainTabs theme={theme} />}
+    </Drawer.Screen>
     <Drawer.Screen name="Account" component={AccountScreen} />
     <Drawer.Screen name="Settings" component={SettingsScreen} />
   </Drawer.Navigator>
@@ -136,10 +139,12 @@ const MainDrawer = () => (
 
 const AppNavigator = () => {
   const { state } = useContext(AuthContext);
+  const { isDarkMode } = useContext(ThemeContext);
+  const theme = isDarkMode ? darkColors : colors;
 
   return (
     <NavigationContainer>
-      {state.isAuthenticated ? <MainDrawer /> : <AuthStack />}
+      {state.isAuthenticated ? <MainDrawer theme={theme} /> : <AuthStack />}
     </NavigationContainer>
   );
 };
