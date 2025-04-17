@@ -47,12 +47,8 @@ const HealthAssistantScreen = () => {
   const [userRecords, setUserRecords] = useState([]);
 
   useEffect(() => {
-    // Set the current user as default selected account
     if (state.user) {
       setSelectedAccount(state.user.id);
-      
-      // In a real app, we would fetch linked accounts
-      // For this demo, we'll create some mock accounts based on the current user
       if (state.user.firstName) {
         const mockAccounts = [
           { id: state.user.id, name: `${state.user.firstName} ${state.user.lastName}`, isPrimary: true },
@@ -61,8 +57,7 @@ const HealthAssistantScreen = () => {
         ];
         setAccounts(mockAccounts);
       }
-      
-      // Add welcome message
+
       if (messages.length === 0) {
         setMessages([
           {
@@ -75,13 +70,13 @@ const HealthAssistantScreen = () => {
       }
     }
   }, [state.user]);
-  
+
   useEffect(() => {
     if (selectedAccount) {
       loadUserRecords();
     }
   }, [selectedAccount]);
-  
+
   const loadUserRecords = async () => {
     try {
       const records = await getAllRecords(selectedAccount);
@@ -93,7 +88,6 @@ const HealthAssistantScreen = () => {
 
   const handleAccountChange = (accountId) => {
     setSelectedAccount(accountId);
-    // Clear chat history when switching accounts
     setMessages([
       {
         id: 'welcome',
@@ -112,40 +106,35 @@ const HealthAssistantScreen = () => {
 
   const handleSendMessage = async () => {
     if (!inputText.trim()) return;
-    
+
     const userMessage = {
       id: Date.now().toString(),
       text: inputText.trim(),
       isUser: true,
       timestamp: new Date(),
     };
-    
+
     setMessages(prevMessages => [...prevMessages, userMessage]);
     setInputText('');
     setIsLoading(true);
-    
+
     try {
-      // Get AI response
       const response = await askHealthAssistant(inputText, userRecords, selectedAccount);
-      
       const aiMessage = {
         id: (Date.now() + 1).toString(),
         text: response,
         isUser: false,
         timestamp: new Date(),
       };
-      
       setMessages(prevMessages => [...prevMessages, aiMessage]);
     } catch (error) {
       console.error('Health assistant error:', error);
-      
       const errorMessage = {
         id: (Date.now() + 1).toString(),
         text: "I'm sorry, I'm having trouble processing your request right now. Please try again later.",
         isUser: false,
         timestamp: new Date(),
       };
-      
       setMessages(prevMessages => [...prevMessages, errorMessage]);
     } finally {
       setIsLoading(false);
@@ -153,7 +142,7 @@ const HealthAssistantScreen = () => {
   };
 
   const renderSuggestion = (text) => (
-    <TouchableOpacity 
+    <TouchableOpacity
       style={styles.suggestionButton}
       onPress={() => {
         setInputText(text);
@@ -181,17 +170,17 @@ const HealthAssistantScreen = () => {
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Health Assistant</Text>
       </View>
-      
-      <AccountSelector 
-        accounts={accounts} 
+
+      <AccountSelector
+        accounts={accounts}
         selectedAccount={selectedAccount}
         onSelectAccount={handleAccountChange}
       />
-      
+
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.keyboardAvoidView}
-        keyboardVerticalOffset={100}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
       >
         <FlatList
           ref={flatListRef}
@@ -199,6 +188,8 @@ const HealthAssistantScreen = () => {
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => <Message message={item} isUser={item.isUser} />}
           contentContainerStyle={styles.messagesList}
+          keyboardShouldPersistTaps="handled"
+          contentInsetAdjustmentBehavior="automatic"
           onContentSizeChange={scrollToEnd}
           onLayout={scrollToEnd}
           ListEmptyComponent={
@@ -207,9 +198,9 @@ const HealthAssistantScreen = () => {
             </View>
           }
         />
-        
+
         {messages.length === 1 && renderSuggestions()}
-        
+
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
@@ -221,8 +212,8 @@ const HealthAssistantScreen = () => {
             returnKeyType="send"
             onSubmitEditing={handleSendMessage}
           />
-          
-          <TouchableOpacity 
+
+          <TouchableOpacity
             style={[styles.sendButton, !inputText.trim() && styles.sendButtonDisabled]}
             onPress={handleSendMessage}
             disabled={!inputText.trim() || isLoading}
@@ -234,7 +225,7 @@ const HealthAssistantScreen = () => {
             )}
           </TouchableOpacity>
         </View>
-        
+
         <View style={styles.disclaimer}>
           <Ionicons name="information-circle-outline" size={16} color={colors.secondaryText} />
           <Text style={styles.disclaimerText}>

@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   RefreshControl,
   SafeAreaView,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthContext } from '../services/auth';
@@ -110,59 +112,66 @@ const HomeScreen = ({ navigation }) => {
         onSelectAccount={handleAccountChange}
       />
 
-      <ScrollView
-        style={styles.content}
-        refreshControl={
-          <RefreshControl
-            refreshing={isRefreshing}
-            onRefresh={handleRefresh}
-            colors={[colors.primary]}
-          />
-        }
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
       >
-        {recentRecords.length > 0 ? (
-          <>
-            <View style={styles.section}>
-              <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>Recent Records</Text>
-                <TouchableOpacity onPress={handleViewAllRecords}>
-                  <Text style={styles.viewAllText}>View All</Text>
-                </TouchableOpacity>
-              </View>
-
-              <View style={styles.recordsContainer}>
-                {recentRecords.slice(0, 3).map((record) => (
-                  <RecordCard key={record.id} record={record} />
-                ))}
-              </View>
-            </View>
-
-            {medicationInteractions.length > 0 && (
+        <ScrollView
+          style={styles.content}
+          keyboardShouldPersistTaps="handled"
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefreshing}
+              onRefresh={handleRefresh}
+              colors={[colors.primary]}
+            />
+          }
+        >
+          {recentRecords.length > 0 ? (
+            <>
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Potential Medication Interactions</Text>
-                <View style={styles.interactionsContainer}>
-                  {medicationInteractions.map((interaction, index) => (
-                    <MedicationInteraction key={index} interaction={interaction} />
+                <View style={styles.sectionHeader}>
+                  <Text style={styles.sectionTitle}>Recent Records</Text>
+                  <TouchableOpacity onPress={handleViewAllRecords}>
+                    <Text style={styles.viewAllText}>View All</Text>
+                  </TouchableOpacity>
+                </View>
+
+                <View style={styles.recordsContainer}>
+                  {recentRecords.slice(0, 3).map((record) => (
+                    <RecordCard key={record.id} record={record} />
                   ))}
                 </View>
               </View>
-            )}
 
-            {healthRecommendations.length > 0 && (
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Health Recommendations</Text>
-                <View style={styles.recommendationsContainer}>
-                  {healthRecommendations.map((recommendation, index) => (
-                    <HealthRecommendation key={index} recommendation={recommendation} />
-                  ))}
+              {medicationInteractions.length > 0 && (
+                <View style={styles.section}>
+                  <Text style={styles.sectionTitle}>Potential Medication Interactions</Text>
+                  <View style={styles.interactionsContainer}>
+                    {medicationInteractions.map((interaction, index) => (
+                      <MedicationInteraction key={index} interaction={interaction} />
+                    ))}
+                  </View>
                 </View>
-              </View>
-            )}
-          </>
-        ) : (
-          renderNoRecordsView()
-        )}
-      </ScrollView>
+              )}
+
+              {healthRecommendations.length > 0 && (
+                <View style={styles.section}>
+                  <Text style={styles.sectionTitle}>Health Recommendations</Text>
+                  <View style={styles.recommendationsContainer}>
+                    {healthRecommendations.map((recommendation, index) => (
+                      <HealthRecommendation key={index} recommendation={recommendation} />
+                    ))}
+                  </View>
+                </View>
+              )}
+            </>
+          ) : (
+            renderNoRecordsView()
+          )}
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };

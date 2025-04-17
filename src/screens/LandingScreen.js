@@ -4,10 +4,12 @@ import {
   Text, 
   StyleSheet, 
   TouchableOpacity, 
-  Image, 
   SafeAreaView, 
   Alert,
-  ActivityIndicator
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView
 } from 'react-native';
 import { Ionicons, FontAwesome } from '@expo/vector-icons';
 import * as LocalAuthentication from 'expo-local-authentication';
@@ -31,7 +33,6 @@ const LandingScreen = ({ navigation }) => {
   const handleGoogleLogin = async () => {
     setIsLoading(true);
     try {
-      // In a real app, we would use Expo AuthSession to authenticate with Google
       await login('email@example.com', 'password', 'google');
     } catch (error) {
       Alert.alert('Login Failed', error.message);
@@ -43,7 +44,6 @@ const LandingScreen = ({ navigation }) => {
   const handleAppleLogin = async () => {
     setIsLoading(true);
     try {
-      // In a real app, we would use Expo AuthSession to authenticate with Apple
       await login('email@example.com', 'password', 'apple');
     } catch (error) {
       Alert.alert('Login Failed', error.message);
@@ -55,7 +55,6 @@ const LandingScreen = ({ navigation }) => {
   const handleEmailLogin = async () => {
     setIsLoading(true);
     try {
-      // This is just a placeholder - in a real app we would show an email/password form
       await login('email@example.com', 'password', 'email');
     } catch (error) {
       Alert.alert('Login Failed', error.message);
@@ -105,56 +104,64 @@ const LandingScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        <View style={styles.logoContainer}>
-          <Text style={styles.logo}>MagdaRecords</Text>
-          <Text style={styles.tagline}>Secure Medical Records at Your Fingertips</Text>
-        </View>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
+      >
+        <ScrollView
+          contentContainerStyle={styles.content}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.logoContainer}>
+            <Text style={styles.logo}>MagdaRecords</Text>
+            <Text style={styles.tagline}>Secure Medical Records at Your Fingertips</Text>
+          </View>
 
-        <View style={styles.authContainer}>
-          <TouchableOpacity style={styles.googleButton} onPress={handleGoogleLogin}>
-            <View style={styles.googleIconContainer}>
-              {/* Google Icon colors rendered to match the multicolored Google logo */}
-              <View style={styles.googleIconWrapper}>
-                <View style={[styles.googlePart, { backgroundColor: '#4285F4' }]} />
-                <View style={[styles.googlePart, { backgroundColor: '#EA4335' }]} />
-                <View style={[styles.googlePart, { backgroundColor: '#FBBC05' }]} />
-                <View style={[styles.googlePart, { backgroundColor: '#34A853' }]} />
+          <View style={styles.authContainer}>
+            <TouchableOpacity style={styles.googleButton} onPress={handleGoogleLogin}>
+              <View style={styles.googleIconContainer}>
+                <View style={styles.googleIconWrapper}>
+                  <View style={[styles.googlePart, { backgroundColor: '#4285F4' }]} />
+                  <View style={[styles.googlePart, { backgroundColor: '#EA4335' }]} />
+                  <View style={[styles.googlePart, { backgroundColor: '#FBBC05' }]} />
+                  <View style={[styles.googlePart, { backgroundColor: '#34A853' }]} />
+                </View>
               </View>
-            </View>
-            <Text style={styles.buttonText}>Continue with Google</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.appleButton} onPress={handleAppleLogin}>
-            <FontAwesome name="apple" size={24} color={colors.white} />
-            <Text style={[styles.buttonText, styles.appleButtonText]}>Continue with Apple</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.emailButton} onPress={handleEmailLogin}>
-            <Ionicons name="mail-outline" size={22} color={colors.primary} />
-            <Text style={[styles.buttonText, styles.emailButtonText]}>Login with Email</Text>
-          </TouchableOpacity>
-
-          {isBiometricAvailable && (
-            <TouchableOpacity style={styles.biometricButton} onPress={handleBiometricAuth}>
-              <Ionicons name="finger-print" size={22} color={colors.primary} />
-              <Text style={[styles.buttonText, styles.emailButtonText]}>Login with Biometrics</Text>
+              <Text style={styles.buttonText}>Continue with Google</Text>
             </TouchableOpacity>
-          )}
-        </View>
 
-        <View style={styles.signUpContainer}>
-          <Text style={styles.signUpText}>Don't have an account?</Text>
-          <TouchableOpacity onPress={handleSignUp}>
-            <Text style={styles.signUpLink}>Sign Up</Text>
-          </TouchableOpacity>
-        </View>
+            <TouchableOpacity style={styles.appleButton} onPress={handleAppleLogin}>
+              <FontAwesome name="apple" size={24} color={colors.white} />
+              <Text style={[styles.buttonText, styles.appleButtonText]}>Continue with Apple</Text>
+            </TouchableOpacity>
 
-        <Text style={styles.privacyText}>
-          By signing in, you agree to our Terms of Service and Privacy Policy.
-          Your data is encrypted and HIPAA compliant.
-        </Text>
-      </View>
+            <TouchableOpacity style={styles.emailButton} onPress={handleEmailLogin}>
+              <Ionicons name="mail-outline" size={22} color={colors.primary} />
+              <Text style={[styles.buttonText, styles.emailButtonText]}>Login with Email</Text>
+            </TouchableOpacity>
+
+            {isBiometricAvailable && (
+              <TouchableOpacity style={styles.biometricButton} onPress={handleBiometricAuth}>
+                <Ionicons name="finger-print" size={22} color={colors.primary} />
+                <Text style={[styles.buttonText, styles.emailButtonText]}>Login with Biometrics</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+
+          <View style={styles.signUpContainer}>
+            <Text style={styles.signUpText}>Don't have an account?</Text>
+            <TouchableOpacity onPress={handleSignUp}>
+              <Text style={styles.signUpLink}>Sign Up</Text>
+            </TouchableOpacity>
+          </View>
+
+          <Text style={styles.privacyText}>
+            By signing in, you agree to our Terms of Service and Privacy Policy.
+            Your data is encrypted and HIPAA compliant.
+          </Text>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
@@ -165,7 +172,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
   },
   content: {
-    flex: 1,
+    flexGrow: 1,
     padding: 24,
     justifyContent: 'center',
   },

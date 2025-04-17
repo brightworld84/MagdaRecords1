@@ -8,6 +8,8 @@ import {
   TouchableOpacity,
   SafeAreaView,
   ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthContext } from '../services/auth';
@@ -36,12 +38,8 @@ const RecordsScreen = () => {
   const [isFilterVisible, setIsFilterVisible] = useState(false);
 
   useEffect(() => {
-    // Set the current user as default selected account
     if (state.user) {
       setSelectedAccount(state.user.id);
-      
-      // In a real app, we would fetch linked accounts
-      // For this demo, we'll create some mock accounts based on the current user
       if (state.user.firstName) {
         const mockAccounts = [
           { id: state.user.id, name: `${state.user.firstName} ${state.user.lastName}`, isPrimary: true },
@@ -51,10 +49,9 @@ const RecordsScreen = () => {
         setAccounts(mockAccounts);
       }
     }
-    
     loadRecords();
   }, [state.user]);
-  
+
   useEffect(() => {
     if (selectedAccount) {
       loadRecords();
@@ -67,7 +64,6 @@ const RecordsScreen = () => {
 
   const loadRecords = async () => {
     if (!selectedAccount) return;
-    
     setIsLoading(true);
     try {
       const allRecords = await getAllRecords(selectedAccount);
@@ -81,27 +77,24 @@ const RecordsScreen = () => {
 
   const applyFilters = () => {
     let filtered = [...records];
-    
-    // Apply search filter
+
     if (searchText) {
       const searchLower = searchText.toLowerCase();
-      filtered = filtered.filter(record => 
+      filtered = filtered.filter(record =>
         record.title.toLowerCase().includes(searchLower) ||
         record.provider.toLowerCase().includes(searchLower) ||
         record.description.toLowerCase().includes(searchLower)
       );
     }
-    
-    // Apply record type filter
+
     if (filterOptions.recordType !== 'all') {
       filtered = filtered.filter(record => record.type === filterOptions.recordType);
     }
-    
-    // Apply date range filter
+
     if (filterOptions.dateRange !== 'all') {
       const now = new Date();
       let startDate;
-      
+
       switch (filterOptions.dateRange) {
         case 'lastMonth':
           startDate = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
@@ -115,39 +108,31 @@ const RecordsScreen = () => {
         default:
           startDate = null;
       }
-      
+
       if (startDate) {
         filtered = filtered.filter(record => new Date(record.date) >= startDate);
       }
     }
-    
-    // Apply provider filter
+
     if (filterOptions.provider !== 'all') {
       filtered = filtered.filter(record => record.provider === filterOptions.provider);
     }
-    
-    // Apply keyword filters
+
     if (filterOptions.keywords && filterOptions.keywords.length > 0) {
       filtered = filtered.filter(record => {
-        // Check if any of the selected keywords match the record
         return filterOptions.keywords.some(keyword => {
-          // Check in record metadata keywords if available
-          if (record.metadata?.keywords && Array.isArray(record.metadata.keywords)) {
-            if (record.metadata.keywords.some(k => 
-              k.toLowerCase().includes(keyword.toLowerCase()) || 
-              keyword.toLowerCase().includes(k.toLowerCase())
-            )) {
-              return true;
-            }
+          if (record.metadata?.keywords?.some(k =>
+            k.toLowerCase().includes(keyword.toLowerCase()) ||
+            keyword.toLowerCase().includes(k.toLowerCase())
+          )) {
+            return true;
           }
-          
-          // Check if keyword appears in title, description, or provider
-          const recordText = `${record.title} ${record.description} ${record.provider}`.toLowerCase();
-          return recordText.includes(keyword.toLowerCase());
+          const text = `${record.title} ${record.description} ${record.provider}`.toLowerCase();
+          return text.includes(keyword.toLowerCase());
         });
       });
     }
-    
+
     setFilteredRecords(filtered);
   };
 
@@ -170,19 +155,10 @@ const RecordsScreen = () => {
       <Text style={styles.emptyStateTitle}>No Records Found</Text>
       <Text style={styles.emptyStateMessage}>
         {searchText || filterOptions.recordType !== 'all' || filterOptions.dateRange !== 'all' || 
-         filterOptions.provider !== 'all' || (filterOptions.keywords && filterOptions.keywords.length > 0)
+         filterOptions.provider !== 'all' || (filterOptions.keywords?.length > 0)
           ? 'Try changing your search or filter criteria.'
           : 'Upload your first medical record to start tracking your health information.'}
       </Text>
-      {!searchText && filterOptions.recordType === 'all' && filterOptions.dateRange === 'all' && 
-       filterOptions.provider === 'all' && (!filterOptions.keywords || filterOptions.keywords.length === 0) && (
-        <TouchableOpacity 
-          style={styles.emptyStateButton}
-          onPress={() => navigation.navigate('Upload')}
-        >
-          <Text style={styles.emptyStateButtonText}>Upload Records</Text>
-        </TouchableOpacity>
-      )}
     </View>
   );
 
@@ -191,61 +167,64 @@ const RecordsScreen = () => {
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Medical Records</Text>
       </View>
-      
-      <AccountSelector 
-        accounts={accounts} 
+
+      <AccountSelector
+        accounts={accounts}
         selectedAccount={selectedAccount}
         onSelectAccount={handleAccountChange}
       />
-      
-      <View style={styles.searchContainer}>
-        <View style={styles.searchInputContainer}>
-          <Ionicons name="search" size={20} color={colors.gray} style={styles.searchIcon} />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search records..."
-            value={searchText}
-            onChangeText={setSearchText}
+
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={100}
+      >
+        <View style={styles.searchContainer}>
+          <View style={styles.searchInputContainer}>
+            <Ionicons name="search" size={20} color={colors.gray} style={styles.searchIcon} />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search records..."
+              value={searchText}
+              onChangeText={setSearchText}
+            />
+            {searchText ? (
+              <TouchableOpacity onPress={() => setSearchText('')}>
+                <Ionicons name="close-circle" size={20} color={colors.gray} />
+              </TouchableOpacity>
+            ) : null}
+          </View>
+
+          <TouchableOpacity style={styles.filterButton} onPress={toggleFilterVisibility}>
+            <Ionicons name="options-outline" size={24} color={colors.primary} />
+          </TouchableOpacity>
+        </View>
+
+        {isFilterVisible && (
+          <RecordFilter
+            options={filterOptions}
+            onApplyFilters={handleFilterChange}
+            onCancel={() => setIsFilterVisible(false)}
+            allRecords={records}
           />
-          {searchText ? (
-            <TouchableOpacity onPress={() => setSearchText('')}>
-              <Ionicons name="close-circle" size={20} color={colors.gray} />
-            </TouchableOpacity>
-          ) : null}
-        </View>
-        
-        <TouchableOpacity 
-          style={styles.filterButton}
-          onPress={toggleFilterVisibility}
-        >
-          <Ionicons name="options-outline" size={24} color={colors.primary} />
-        </TouchableOpacity>
-      </View>
-      
-      {isFilterVisible && (
-        <RecordFilter 
-          options={filterOptions || { recordType: 'all', dateRange: 'all', provider: 'all', keywords: [] }}
-          onApplyFilters={handleFilterChange}
-          onCancel={() => setIsFilterVisible(false)}
-          allRecords={records || []}
-        />
-      )}
-      
-      {isLoading ? (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={colors.primary} />
-          <Text style={styles.loadingText}>Loading records...</Text>
-        </View>
-      ) : (
-        <FlatList
-          data={filteredRecords}
-          renderItem={({ item }) => <RecordCard record={item} />}
-          keyExtractor={item => item.id}
-          contentContainerStyle={styles.recordsList}
-          ListEmptyComponent={renderEmptyState}
-          ItemSeparatorComponent={() => <View style={styles.separator} />}
-        />
-      )}
+        )}
+
+        {isLoading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={colors.primary} />
+            <Text style={styles.loadingText}>Loading records...</Text>
+          </View>
+        ) : (
+          <FlatList
+            data={filteredRecords}
+            renderItem={({ item }) => <RecordCard record={item} />}
+            keyExtractor={item => item.id}
+            contentContainerStyle={styles.recordsList}
+            ListEmptyComponent={renderEmptyState}
+            ItemSeparatorComponent={() => <View style={styles.separator} />}
+          />
+        )}
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
@@ -315,12 +294,6 @@ const styles = StyleSheet.create({
     color: colors.secondaryText,
     textAlign: 'center',
     marginBottom: spacing.medium,
-  },
-  emptyStateButton: {
-    backgroundColor: colors.primary,
-    paddingVertical: spacing.medium,
-    paddingHorizontal: spacing.large,
-    borderRadius: 8,
   },
   emptyStateButtonText: {
     ...typography.button,
