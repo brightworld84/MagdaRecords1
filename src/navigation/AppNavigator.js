@@ -4,6 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Platform } from 'react-native';
 
 // Screens
 import LandingScreen from '../screens/LandingScreen';
@@ -49,7 +50,12 @@ const MainTabs = ({ theme }) => (
         backgroundColor: theme.card,
         borderTopColor: theme.lightGray,
         paddingTop: 5,
-        height: 60,
+        height: 70,
+        elevation: 8, // Android shadow
+        shadowColor: theme.shadow,
+        shadowOffset: { width: 0, height: -2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
       },
       headerShown: false,
     }}
@@ -108,9 +114,12 @@ const MainDrawer = ({ theme }) => (
     screenOptions={{
       headerStyle: {
         backgroundColor: theme.card,
-        elevation: 0,
-        shadowOpacity: 0,
-        borderBottomWidth: 1,
+        elevation: 6,
+        shadowColor: theme.shadow,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.15,
+        shadowRadius: 4,
+        borderBottomWidth: Platform.OS === 'android' ? 0 : 1,
         borderBottomColor: theme.lightGray,
       },
       headerTintColor: theme.text,
