@@ -13,16 +13,21 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthContext } from '../services/auth';
+import { ThemeContext } from '../contexts/ThemeContext';
 import { getAllRecords } from '../services/storage';
 import RecordCard from '../components/RecordCard';
 import RecordFilter from '../components/RecordFilter';
 import AccountSelector from '../components/AccountSelector';
 import colors from '../theme/colors';
+import darkColors from '../theme/darkColors';
 import typography from '../theme/typography';
 import spacing from '../theme/spacing';
 
 const RecordsScreen = () => {
   const { state } = useContext(AuthContext);
+  const { isDarkMode } = useContext(ThemeContext);
+  const theme = isDarkMode ? darkColors : colors;
+
   const [records, setRecords] = useState([]);
   const [filteredRecords, setFilteredRecords] = useState([]);
   const [searchText, setSearchText] = useState('');
@@ -151,9 +156,9 @@ const RecordsScreen = () => {
 
   const renderEmptyState = () => (
     <View style={styles.emptyStateContainer}>
-      <Ionicons name="document-text-outline" size={64} color={colors.lightGray} />
-      <Text style={styles.emptyStateTitle}>No Records Found</Text>
-      <Text style={styles.emptyStateMessage}>
+      <Ionicons name="document-text-outline" size={64} color={theme.lightGray} />
+      <Text style={[styles.emptyStateTitle, { color: theme.text }]}>No Records Found</Text>
+      <Text style={[styles.emptyStateMessage, { color: theme.secondaryText }]}>
         {searchText || filterOptions.recordType !== 'all' || filterOptions.dateRange !== 'all' || 
          filterOptions.provider !== 'all' || (filterOptions.keywords?.length > 0)
           ? 'Try changing your search or filter criteria.'
@@ -163,9 +168,9 @@ const RecordsScreen = () => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Medical Records</Text>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+      <View style={[styles.header, { backgroundColor: theme.white, borderBottomColor: theme.lightGray }]}>
+        <Text style={[styles.headerTitle, { color: theme.text }]}>Medical Records</Text>
       </View>
 
       <AccountSelector
@@ -179,24 +184,25 @@ const RecordsScreen = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={100}
       >
-        <View style={styles.searchContainer}>
-          <View style={styles.searchInputContainer}>
-            <Ionicons name="search" size={20} color={colors.gray} style={styles.searchIcon} />
+        <View style={[styles.searchContainer, { backgroundColor: theme.white }]}>
+          <View style={[styles.searchInputContainer, { backgroundColor: theme.background }]}>
+            <Ionicons name="search" size={20} color={theme.gray} style={styles.searchIcon} />
             <TextInput
-              style={styles.searchInput}
+              style={[styles.searchInput, { color: theme.text }]}
               placeholder="Search records..."
+              placeholderTextColor={theme.secondaryText}
               value={searchText}
               onChangeText={setSearchText}
             />
             {searchText ? (
               <TouchableOpacity onPress={() => setSearchText('')}>
-                <Ionicons name="close-circle" size={20} color={colors.gray} />
+                <Ionicons name="close-circle" size={20} color={theme.gray} />
               </TouchableOpacity>
             ) : null}
           </View>
 
           <TouchableOpacity style={styles.filterButton} onPress={toggleFilterVisibility}>
-            <Ionicons name="options-outline" size={24} color={colors.primary} />
+            <Ionicons name="options-outline" size={24} color={theme.primary} />
           </TouchableOpacity>
         </View>
 
@@ -211,8 +217,8 @@ const RecordsScreen = () => {
 
         {isLoading ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={colors.primary} />
-            <Text style={styles.loadingText}>Loading records...</Text>
+            <ActivityIndicator size="large" color={theme.primary} />
+            <Text style={[styles.loadingText, { color: theme.text }]}>Loading records...</Text>
           </View>
         ) : (
           <FlatList
@@ -232,30 +238,24 @@ const RecordsScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   header: {
     padding: spacing.medium,
-    backgroundColor: colors.white,
     borderBottomWidth: 1,
-    borderBottomColor: colors.lightGray,
     alignItems: 'center',
   },
   headerTitle: {
     ...typography.h2,
-    color: colors.text,
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: spacing.medium,
-    backgroundColor: colors.white,
   },
   searchInputContainer: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.background,
     borderRadius: 8,
     paddingHorizontal: spacing.medium,
     height: 40,
@@ -266,7 +266,6 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 16,
-    color: colors.text,
   },
   filterButton: {
     marginLeft: spacing.medium,
@@ -285,19 +284,13 @@ const styles = StyleSheet.create({
   },
   emptyStateTitle: {
     ...typography.h3,
-    color: colors.text,
     marginTop: spacing.medium,
     marginBottom: spacing.small,
   },
   emptyStateMessage: {
     ...typography.body,
-    color: colors.secondaryText,
     textAlign: 'center',
     marginBottom: spacing.medium,
-  },
-  emptyStateButtonText: {
-    ...typography.button,
-    color: colors.white,
   },
   loadingContainer: {
     flex: 1,
@@ -306,7 +299,6 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     ...typography.body,
-    color: colors.text,
     marginTop: spacing.medium,
   },
 });

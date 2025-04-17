@@ -157,9 +157,7 @@ const LandingScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
+  container: { flex: 1 },
   content: {
     flexGrow: 1,
     padding: 24,

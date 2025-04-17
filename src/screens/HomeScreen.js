@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthContext } from '../services/auth';
+import { ThemeContext } from '../contexts/ThemeContext';
 import { getRecentRecords } from '../services/storage';
 import { analyzeMedicationInteractions, getHealthRecommendations } from '../services/ai';
 import RecordCard from '../components/RecordCard';
@@ -19,11 +20,15 @@ import MedicationInteraction from '../components/MedicationInteraction';
 import HealthRecommendation from '../components/HealthRecommendation';
 import AccountSelector from '../components/AccountSelector';
 import colors from '../theme/colors';
+import darkColors from '../theme/darkColors';
 import typography from '../theme/typography';
 import spacing from '../theme/spacing';
 
 const HomeScreen = ({ navigation }) => {
   const { state } = useContext(AuthContext);
+  const { isDarkMode } = useContext(ThemeContext);
+  const theme = isDarkMode ? darkColors : colors;
+
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [recentRecords, setRecentRecords] = useState([]);
   const [medicationInteractions, setMedicationInteractions] = useState([]);
@@ -89,23 +94,23 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const renderNoRecordsView = () => (
-    <View style={styles.emptyStateContainer}>
-      <Ionicons name="document-text-outline" size={64} color={colors.lightGray} />
-      <Text style={styles.emptyStateTitle}>No Records Yet</Text>
-      <Text style={styles.emptyStateMessage}>
+    <View style={[styles.emptyStateContainer, { backgroundColor: theme.white }]}>
+      <Ionicons name="document-text-outline" size={64} color={theme.lightGray} />
+      <Text style={[styles.emptyStateTitle, { color: theme.text }]}>No Records Yet</Text>
+      <Text style={[styles.emptyStateMessage, { color: theme.secondaryText }]}>
         Upload your first medical record to start tracking your health information.
       </Text>
       <TouchableOpacity 
-        style={styles.emptyStateButton}
+        style={[styles.emptyStateButton, { backgroundColor: theme.primary }]}
         onPress={() => navigation.navigate('Upload')}
       >
-        <Text style={styles.emptyStateButtonText}>Upload Records</Text>
+        <Text style={[styles.emptyStateButtonText, { color: theme.white }]}>Upload Records</Text>
       </TouchableOpacity>
     </View>
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       <AccountSelector 
         accounts={accounts} 
         selectedAccount={selectedAccount}
@@ -124,17 +129,17 @@ const HomeScreen = ({ navigation }) => {
             <RefreshControl
               refreshing={isRefreshing}
               onRefresh={handleRefresh}
-              colors={[colors.primary]}
+              colors={[theme.primary]}
             />
           }
         >
           {recentRecords.length > 0 ? (
             <>
-              <View style={styles.section}>
+              <View style={[styles.section, { backgroundColor: theme.white, shadowColor: theme.black }]}>
                 <View style={styles.sectionHeader}>
-                  <Text style={styles.sectionTitle}>Recent Records</Text>
+                  <Text style={[styles.sectionTitle, { color: theme.text }]}>Recent Records</Text>
                   <TouchableOpacity onPress={handleViewAllRecords}>
-                    <Text style={styles.viewAllText}>View All</Text>
+                    <Text style={[styles.viewAllText, { color: theme.primary }]}>View All</Text>
                   </TouchableOpacity>
                 </View>
 
@@ -146,8 +151,10 @@ const HomeScreen = ({ navigation }) => {
               </View>
 
               {medicationInteractions.length > 0 && (
-                <View style={styles.section}>
-                  <Text style={styles.sectionTitle}>Potential Medication Interactions</Text>
+                <View style={[styles.section, { backgroundColor: theme.white, shadowColor: theme.black }]}>
+                  <Text style={[styles.sectionTitle, { color: theme.text }]}>
+                    Potential Medication Interactions
+                  </Text>
                   <View style={styles.interactionsContainer}>
                     {medicationInteractions.map((interaction, index) => (
                       <MedicationInteraction key={index} interaction={interaction} />
@@ -157,8 +164,8 @@ const HomeScreen = ({ navigation }) => {
               )}
 
               {healthRecommendations.length > 0 && (
-                <View style={styles.section}>
-                  <Text style={styles.sectionTitle}>Health Recommendations</Text>
+                <View style={[styles.section, { backgroundColor: theme.white, shadowColor: theme.black }]}>
+                  <Text style={[styles.sectionTitle, { color: theme.text }]}>Health Recommendations</Text>
                   <View style={styles.recommendationsContainer}>
                     {healthRecommendations.map((recommendation, index) => (
                       <HealthRecommendation key={index} recommendation={recommendation} />
@@ -179,19 +186,16 @@ const HomeScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   content: {
     flex: 1,
     padding: spacing.medium,
   },
   section: {
-    backgroundColor: colors.white,
     borderRadius: 12,
     padding: spacing.medium,
     marginBottom: spacing.medium,
     elevation: 2,
-    shadowColor: colors.black,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
@@ -204,11 +208,9 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     ...typography.h3,
-    color: colors.text,
   },
   viewAllText: {
     ...typography.button,
-    color: colors.primary,
   },
   recordsContainer: {
     marginBottom: spacing.medium,
@@ -224,31 +226,26 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: spacing.large,
-    backgroundColor: colors.white,
     borderRadius: 12,
     marginBottom: spacing.medium,
   },
   emptyStateTitle: {
     ...typography.h2,
-    color: colors.text,
     marginTop: spacing.medium,
     marginBottom: spacing.small,
   },
   emptyStateMessage: {
     ...typography.body,
-    color: colors.secondaryText,
     textAlign: 'center',
     marginBottom: spacing.medium,
   },
   emptyStateButton: {
-    backgroundColor: colors.primary,
     paddingVertical: spacing.medium,
     paddingHorizontal: spacing.large,
     borderRadius: 8,
   },
   emptyStateButtonText: {
     ...typography.button,
-    color: colors.white,
   },
 });
 

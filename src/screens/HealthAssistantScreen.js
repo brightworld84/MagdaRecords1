@@ -14,22 +14,36 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthContext } from '../services/auth';
+import { ThemeContext } from '../contexts/ThemeContext';
 import { askHealthAssistant } from '../services/ai';
 import { getAllRecords } from '../services/storage';
 import AccountSelector from '../components/AccountSelector';
 import colors from '../theme/colors';
+import darkColors from '../theme/darkColors';
 import typography from '../theme/typography';
 import spacing from '../theme/spacing';
 
-const Message = ({ message, isUser }) => (
+const Message = ({ message, isUser, theme }) => (
   <View style={[styles.messageContainer, isUser ? styles.userMessage : styles.aiMessage]}>
     {!isUser && (
-      <View style={styles.aiIconContainer}>
-        <Ionicons name="medkit" size={20} color={colors.white} />
+      <View style={[styles.aiIconContainer, { backgroundColor: theme.accent }]}>
+        <Ionicons name="medkit" size={20} color={theme.white} />
       </View>
     )}
-    <View style={[styles.messageBubble, isUser ? styles.userBubble : styles.aiBubble]}>
-      <Text style={[styles.messageText, isUser ? styles.userText : styles.aiText]}>
+    <View
+      style={[
+        styles.messageBubble,
+        isUser
+          ? [styles.userBubble, { backgroundColor: theme.primary }]
+          : [styles.aiBubble, { backgroundColor: theme.white }],
+      ]}
+    >
+      <Text
+        style={[
+          styles.messageText,
+          isUser ? { color: theme.white } : { color: theme.text },
+        ]}
+      >
         {message.text}
       </Text>
     </View>
@@ -38,6 +52,9 @@ const Message = ({ message, isUser }) => (
 
 const HealthAssistantScreen = () => {
   const { state } = useContext(AuthContext);
+  const { isDarkMode } = useContext(ThemeContext);
+  const theme = isDarkMode ? darkColors : colors;
+
   const [selectedAccount, setSelectedAccount] = useState(null);
   const [accounts, setAccounts] = useState([]);
   const [messages, setMessages] = useState([]);
@@ -143,19 +160,19 @@ const HealthAssistantScreen = () => {
 
   const renderSuggestion = (text) => (
     <TouchableOpacity
-      style={styles.suggestionButton}
+      style={[styles.suggestionButton, { backgroundColor: theme.white, borderColor: theme.lightGray }]}
       onPress={() => {
         setInputText(text);
         handleSendMessage();
       }}
     >
-      <Text style={styles.suggestionText}>{text}</Text>
+      <Text style={[styles.suggestionText, { color: theme.primary }]}>{text}</Text>
     </TouchableOpacity>
   );
 
   const renderSuggestions = () => (
-    <View style={styles.suggestionsContainer}>
-      <Text style={styles.suggestionsTitle}>Suggested Questions:</Text>
+    <View style={[styles.suggestionsContainer, { backgroundColor: theme.lightBackground }]}>
+      <Text style={[styles.suggestionsTitle, { color: theme.text }]}>Suggested Questions:</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.suggestionsScroll}>
         {renderSuggestion("What medications am I currently taking?")}
         {renderSuggestion("When was my last physical exam?")}
@@ -166,9 +183,9 @@ const HealthAssistantScreen = () => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Health Assistant</Text>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+      <View style={[styles.header, { backgroundColor: theme.white, borderBottomColor: theme.lightGray }]}>
+        <Text style={[styles.headerTitle, { color: theme.text }]}>Health Assistant</Text>
       </View>
 
       <AccountSelector
@@ -186,7 +203,7 @@ const HealthAssistantScreen = () => {
           ref={flatListRef}
           data={messages}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => <Message message={item} isUser={item.isUser} />}
+          renderItem={({ item }) => <Message message={item} isUser={item.isUser} theme={theme} />}
           contentContainerStyle={styles.messagesList}
           keyboardShouldPersistTaps="handled"
           contentInsetAdjustmentBehavior="automatic"
@@ -194,19 +211,22 @@ const HealthAssistantScreen = () => {
           onLayout={scrollToEnd}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>Ask a question to get started</Text>
+              <Text style={[styles.emptyText, { color: theme.secondaryText }]}>
+                Ask a question to get started
+              </Text>
             </View>
           }
         />
 
         {messages.length === 1 && renderSuggestions()}
 
-        <View style={styles.inputContainer}>
+        <View style={[styles.inputContainer, { backgroundColor: theme.white, borderTopColor: theme.lightGray }]}>
           <TextInput
-            style={styles.input}
+            style={[styles.input, { backgroundColor: theme.background, color: theme.text }]}
             value={inputText}
             onChangeText={setInputText}
             placeholder="Ask a health question..."
+            placeholderTextColor={theme.secondaryText}
             multiline
             maxHeight={100}
             returnKeyType="send"
@@ -214,21 +234,29 @@ const HealthAssistantScreen = () => {
           />
 
           <TouchableOpacity
-            style={[styles.sendButton, !inputText.trim() && styles.sendButtonDisabled]}
+            style={[
+              styles.sendButton,
+              { backgroundColor: inputText.trim() ? theme.primary : theme.lightGray },
+            ]}
             onPress={handleSendMessage}
             disabled={!inputText.trim() || isLoading}
           >
             {isLoading ? (
-              <ActivityIndicator color={colors.white} size="small" />
+              <ActivityIndicator color={theme.white} size="small" />
             ) : (
-              <Ionicons name="send" size={20} color={colors.white} />
+              <Ionicons name="send" size={20} color={theme.white} />
             )}
           </TouchableOpacity>
         </View>
 
-        <View style={styles.disclaimer}>
-          <Ionicons name="information-circle-outline" size={16} color={colors.secondaryText} />
-          <Text style={styles.disclaimerText}>
+        <View
+          style={[
+            styles.disclaimer,
+            { backgroundColor: theme.lightBackground, borderTopColor: theme.lightGray },
+          ]}
+        >
+          <Ionicons name="information-circle-outline" size={16} color={theme.secondaryText} />
+          <Text style={[styles.disclaimerText, { color: theme.secondaryText }]}>
             This assistant provides general information and is not a substitute for professional medical advice.
           </Text>
         </View>
@@ -238,20 +266,14 @@ const HealthAssistantScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
+  container: { flex: 1 },
   header: {
     padding: spacing.medium,
-    backgroundColor: colors.white,
     borderBottomWidth: 1,
-    borderBottomColor: colors.lightGray,
     alignItems: 'center',
   },
   headerTitle: {
     ...typography.h2,
-    color: colors.text,
   },
   keyboardAvoidView: {
     flex: 1,
@@ -277,30 +299,14 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.medium,
     paddingHorizontal: spacing.medium,
     elevation: 1,
-    shadowColor: colors.black,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 1,
   },
-  userBubble: {
-    backgroundColor: colors.primary,
-    borderTopRightRadius: 4,
-  },
-  aiBubble: {
-    backgroundColor: colors.white,
-    borderTopLeftRadius: 4,
-  },
   messageText: {
     ...typography.body,
   },
-  userText: {
-    color: colors.white,
-  },
-  aiText: {
-    color: colors.text,
-  },
   aiIconContainer: {
-    backgroundColor: colors.accent,
     width: 28,
     height: 28,
     borderRadius: 14,
@@ -311,32 +317,25 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.white,
     paddingHorizontal: spacing.medium,
     paddingVertical: spacing.medium,
     borderTopWidth: 1,
-    borderTopColor: colors.lightGray,
   },
   input: {
     flex: 1,
     ...typography.body,
-    backgroundColor: colors.background,
     borderRadius: 20,
     paddingHorizontal: spacing.medium,
     paddingVertical: spacing.small,
     maxHeight: 100,
   },
   sendButton: {
-    backgroundColor: colors.primary,
     width: 40,
     height: 40,
     borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: spacing.small,
-  },
-  sendButtonDisabled: {
-    backgroundColor: colors.lightGray,
   },
   emptyContainer: {
     flex: 1,
@@ -346,46 +345,37 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     ...typography.body,
-    color: colors.secondaryText,
   },
   disclaimer: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: spacing.small,
-    backgroundColor: colors.lightBackground,
     borderTopWidth: 1,
-    borderTopColor: colors.lightGray,
   },
   disclaimerText: {
     ...typography.small,
-    color: colors.secondaryText,
     flex: 1,
     marginLeft: spacing.extraSmall,
   },
   suggestionsContainer: {
     padding: spacing.medium,
-    backgroundColor: colors.lightBackground,
   },
   suggestionsTitle: {
     ...typography.label,
-    color: colors.text,
     marginBottom: spacing.small,
   },
   suggestionsScroll: {
     flexDirection: 'row',
   },
   suggestionButton: {
-    backgroundColor: colors.white,
     paddingHorizontal: spacing.medium,
     paddingVertical: spacing.small,
     borderRadius: 20,
     marginRight: spacing.small,
     borderWidth: 1,
-    borderColor: colors.lightGray,
   },
   suggestionText: {
     ...typography.small,
-    color: colors.primary,
   },
 });
 

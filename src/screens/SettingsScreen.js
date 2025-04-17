@@ -21,12 +21,14 @@ import { ThemeContext } from '../theme/themeContext';
 import { getUserSettings, updateUserSettings, changePassword } from '../services/storage';
 import { validatePassword } from '../utils/validation';
 import colors from '../theme/colors';
+import darkColors from '../theme/darkColors';
 import typography from '../theme/typography';
 import spacing from '../theme/spacing';
 
 const SettingsScreen = ({ navigation }) => {
   const { state, updateUser } = useContext(AuthContext);
   const { isDarkMode, toggleDarkMode } = useContext(ThemeContext);
+  const theme = isDarkMode ? darkColors : colors;
 
   const [isLoading, setIsLoading] = useState(true);
   const [settings, setSettings] = useState({
@@ -110,33 +112,31 @@ const SettingsScreen = ({ navigation }) => {
     }
   };
 
-  // ... other password modal logic remains unchanged ...
-
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       <ScrollView style={styles.scrollContainer}>
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Appearance</Text>
+          <Text style={[styles.sectionTitle, { color: theme.text }]}>Appearance</Text>
 
-          {/* ✅ DARK MODE TOGGLE */}
           <View style={styles.settingItem}>
             <View style={styles.settingTextContainer}>
-              <Text style={styles.settingTitle}>Dark Mode</Text>
-              <Text style={styles.settingDescription}>Enable dark theme across the app</Text>
+              <Text style={[styles.settingTitle, { color: theme.text }]}>Dark Mode</Text>
+              <Text style={[styles.settingDescription, { color: theme.secondaryText }]}>
+                Enable dark theme across the app
+              </Text>
             </View>
             <Switch
-              trackColor={{ false: colors.lightGray, true: colors.primaryLight }}
-              thumbColor={settings.darkMode ? colors.primary : colors.gray}
+              trackColor={{ false: theme.lightGray, true: theme.primaryLight }}
+              thumbColor={settings.darkMode ? theme.primary : theme.gray}
               onValueChange={(value) => handleToggleSetting('darkMode', value)}
               value={settings.darkMode}
             />
           </View>
-
-          {/* Add any other toggles you want here... */}
         </View>
       </ScrollView>
 
-      {renderPasswordModal()}
+      {/* This assumes renderPasswordModal() returns a modal with proper KeyboardAvoidingView */}
+      {renderPasswordModal && renderPasswordModal()}
     </SafeAreaView>
   );
 };
@@ -144,7 +144,6 @@ const SettingsScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   scrollContainer: {
     flexGrow: 1,
@@ -155,7 +154,6 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     ...typography.h3,
-    color: colors.text,
     marginBottom: spacing.medium,
   },
   settingItem: {
@@ -170,13 +168,10 @@ const styles = StyleSheet.create({
   },
   settingTitle: {
     ...typography.subtitle,
-    color: colors.text,
   },
   settingDescription: {
     ...typography.small,
-    color: colors.secondaryText,
   },
-  // Add any other reused styles here...
 });
 
 export default SettingsScreen;

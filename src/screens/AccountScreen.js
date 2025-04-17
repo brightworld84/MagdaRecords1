@@ -21,12 +21,17 @@ import {
   removeLinkedAccount,
   updateUserDetails,
 } from '../services/storage';
+import { ThemeContext } from '../contexts/ThemeContext';
 import colors from '../theme/colors';
+import darkColors from '../theme/darkColors';
 import typography from '../theme/typography';
 import spacing from '../theme/spacing';
 
 const AccountScreen = ({ navigation }) => {
   const { state, updateUser, logout } = useContext(AuthContext);
+  const { isDarkMode } = useContext(ThemeContext);
+  const theme = isDarkMode ? darkColors : colors;
+
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [firstName, setFirstName] = useState('');
@@ -183,15 +188,15 @@ const AccountScreen = ({ navigation }) => {
 
   if (isLoading && !isEditing) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={colors.primary} />
-        <Text style={styles.loadingText}>Loading account information...</Text>
+      <View style={[styles.loadingContainer, { backgroundColor: theme.background }]}>
+        <ActivityIndicator size="large" color={theme.primary} />
+        <Text style={[styles.loadingText, { color: theme.text }]}>Loading account information...</Text>
       </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -202,8 +207,7 @@ const AccountScreen = ({ navigation }) => {
           contentContainerStyle={{ paddingBottom: 100 }}
           keyboardShouldPersistTaps="handled"
         >
-          {/* All existing JSX content (header, sections, inputs, etc.) remains unchanged here */}
-          {/* Just insert the full screen content here exactly as you had it, inside ScrollView */}
+          {/* Insert your full screen layout here (unchanged layout logic) */}
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -213,7 +217,6 @@ const AccountScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   content: {
     flex: 1,
@@ -223,11 +226,9 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: colors.background,
   },
   loadingText: {
     ...typography.body,
-    color: colors.text,
     marginTop: spacing.medium,
   },
 });

@@ -12,21 +12,26 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { Ionicons, MaterialIcons, Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import * as DocumentPicker from 'expo-document-picker';
 import { Camera } from 'expo-camera';
 import { AuthContext } from '../services/auth';
+import { ThemeContext } from '../contexts/ThemeContext';
 import { uploadRecord } from '../services/storage';
 import { extractTextFromImage } from '../services/ai';
 import { importFromFHIR } from '../services/fhir';
 import AccountSelector from '../components/AccountSelector';
 import colors from '../theme/colors';
+import darkColors from '../theme/darkColors';
 import typography from '../theme/typography';
 import spacing from '../theme/spacing';
 
 const UploadScreen = () => {
   const { state } = useContext(AuthContext);
+  const { isDarkMode } = useContext(ThemeContext);
+  const theme = isDarkMode ? darkColors : colors;
+
   const [selectedAccount, setSelectedAccount] = useState(null);
   const [accounts, setAccounts] = useState([]);
   const [uploadType, setUploadType] = useState('');
@@ -36,7 +41,6 @@ const UploadScreen = () => {
   const [recordProvider, setRecordProvider] = useState('');
   const [recordDate, setRecordDate] = useState('');
   const [recordType, setRecordType] = useState('');
-  const [showCamera, setShowCamera] = useState(false);
   const [fhirEndpoint, setFhirEndpoint] = useState('');
   const [email, setEmail] = useState('');
   const cameraRef = useRef(null);
@@ -179,7 +183,7 @@ const UploadScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -189,70 +193,79 @@ const UploadScreen = () => {
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
         >
-          <Text style={styles.headerTitle}>Upload Medical Records</Text>
+          <Text style={[styles.headerTitle, { color: theme.text }]}>Upload Medical Records</Text>
           <AccountSelector
             accounts={accounts}
             selectedAccount={selectedAccount}
             onSelectAccount={(id) => setSelectedAccount(id)}
           />
           {uploadType ? (
-            <View style={styles.formContainer}>
+            <View style={[styles.formContainer, { backgroundColor: theme.card }]}>
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Record Title*</Text>
+                <Text style={[styles.label, { color: theme.text }]}>Record Title*</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { color: theme.text, borderColor: theme.lightGray }]}
                   value={recordTitle}
                   onChangeText={setRecordTitle}
                   placeholder="e.g., Blood Test Results"
+                  placeholderTextColor={theme.secondaryText}
                 />
               </View>
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Date of Record*</Text>
+                <Text style={[styles.label, { color: theme.text }]}>Date of Record*</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { color: theme.text, borderColor: theme.lightGray }]}
                   value={recordDate}
                   onChangeText={handleDateChange}
                   placeholder="MM/DD/YYYY"
+                  placeholderTextColor={theme.secondaryText}
                   keyboardType="numeric"
                   maxLength={10}
                 />
               </View>
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Provider/Facility</Text>
+                <Text style={[styles.label, { color: theme.text }]}>Provider/Facility</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { color: theme.text, borderColor: theme.lightGray }]}
                   value={recordProvider}
                   onChangeText={setRecordProvider}
                   placeholder="e.g., Dr. Smith or Memorial Hospital"
+                  placeholderTextColor={theme.secondaryText}
                 />
               </View>
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Description</Text>
+                <Text style={[styles.label, { color: theme.text }]}>Description</Text>
                 <TextInput
-                  style={[styles.input, styles.textArea]}
+                  style={[styles.input, styles.textArea, { color: theme.text, borderColor: theme.lightGray }]}
                   value={recordDescription}
                   onChangeText={setRecordDescription}
                   placeholder="Enter details about this record"
+                  placeholderTextColor={theme.secondaryText}
                   multiline
                   numberOfLines={4}
                 />
               </View>
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Record Type*</Text>
+                <Text style={[styles.label, { color: theme.text }]}>Record Type*</Text>
                 <View style={styles.recordTypeContainer}>
                   {recordTypes.map((type) => (
                     <TouchableOpacity
                       key={type.id}
                       style={[
                         styles.recordTypeButton,
-                        recordType === type.id && styles.recordTypeButtonSelected,
+                        {
+                          borderColor: theme.lightGray,
+                          backgroundColor: recordType === type.id ? theme.primary : 'transparent',
+                        },
                       ]}
                       onPress={() => setRecordType(type.id)}
                     >
                       <Text
                         style={[
                           styles.recordTypeButtonText,
-                          recordType === type.id && styles.recordTypeButtonTextSelected,
+                          {
+                            color: recordType === type.id ? theme.white : theme.text,
+                          },
                         ]}
                       >
                         {type.label}
@@ -262,29 +275,29 @@ const UploadScreen = () => {
                 </View>
               </View>
               <TouchableOpacity
-                style={styles.saveButton}
+                style={[styles.saveButton, { backgroundColor: theme.primary }]}
                 onPress={saveRecord}
                 disabled={isLoading}
               >
                 {isLoading ? (
-                  <ActivityIndicator color={colors.white} />
+                  <ActivityIndicator color={theme.white} />
                 ) : (
-                  <Text style={styles.saveButtonText}>Save Record</Text>
+                  <Text style={[styles.saveButtonText, { color: theme.white }]}>Save Record</Text>
                 )}
               </TouchableOpacity>
               <TouchableOpacity style={styles.cancelButton} onPress={resetForm}>
-                <Text style={styles.cancelButtonText}>Cancel</Text>
+                <Text style={[styles.cancelButtonText, { color: theme.error }]}>Cancel</Text>
               </TouchableOpacity>
             </View>
           ) : (
             <View>
-              <TouchableOpacity style={styles.uploadOption} onPress={pickImage}>
-                <Ionicons name="images-outline" size={24} color={colors.primary} />
-                <Text style={styles.uploadOptionText}>Upload Image</Text>
+              <TouchableOpacity style={[styles.uploadOption, { backgroundColor: theme.card }]} onPress={pickImage}>
+                <Ionicons name="images-outline" size={24} color={theme.primary} />
+                <Text style={[styles.uploadOptionText, { color: theme.text }]}>Upload Image</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.uploadOption} onPress={pickDocument}>
-                <Ionicons name="document-outline" size={24} color={colors.primary} />
-                <Text style={styles.uploadOptionText}>Upload Document</Text>
+              <TouchableOpacity style={[styles.uploadOption, { backgroundColor: theme.card }]} onPress={pickDocument}>
+                <Ionicons name="document-outline" size={24} color={theme.primary} />
+                <Text style={[styles.uploadOptionText, { color: theme.text }]}>Upload Document</Text>
               </TouchableOpacity>
             </View>
           )}
@@ -295,17 +308,15 @@ const UploadScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
+  container: { flex: 1 },
   flex: { flex: 1 },
   scrollContent: { padding: spacing.medium },
   headerTitle: {
     ...typography.h2,
-    color: colors.text,
     textAlign: 'center',
     marginBottom: spacing.large,
   },
   formContainer: {
-    backgroundColor: colors.white,
     borderRadius: 12,
     padding: spacing.medium,
     marginTop: spacing.medium,
@@ -313,14 +324,11 @@ const styles = StyleSheet.create({
   inputGroup: { marginBottom: spacing.medium },
   label: {
     ...typography.label,
-    color: colors.text,
     marginBottom: spacing.extraSmall,
   },
   input: {
     ...typography.input,
-    backgroundColor: colors.white,
     borderWidth: 1,
-    borderColor: colors.lightGray,
     borderRadius: 8,
     padding: spacing.medium,
   },
@@ -339,23 +347,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.medium,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: colors.lightGray,
     marginRight: spacing.small,
     marginBottom: spacing.small,
   },
-  recordTypeButtonSelected: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
-  },
   recordTypeButtonText: {
     ...typography.button,
-    color: colors.text,
-  },
-  recordTypeButtonTextSelected: {
-    color: colors.white,
   },
   saveButton: {
-    backgroundColor: colors.primary,
     paddingVertical: spacing.medium,
     borderRadius: 8,
     alignItems: 'center',
@@ -363,7 +361,6 @@ const styles = StyleSheet.create({
   },
   saveButtonText: {
     ...typography.button,
-    color: colors.white,
   },
   cancelButton: {
     alignItems: 'center',
@@ -371,13 +368,11 @@ const styles = StyleSheet.create({
   },
   cancelButtonText: {
     ...typography.body,
-    color: colors.error,
   },
   uploadOption: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: spacing.medium,
-    backgroundColor: colors.white,
     borderRadius: 12,
     marginBottom: spacing.medium,
     elevation: 2,
@@ -385,7 +380,6 @@ const styles = StyleSheet.create({
   uploadOptionText: {
     marginLeft: spacing.medium,
     ...typography.body,
-    color: colors.text,
   },
 });
 

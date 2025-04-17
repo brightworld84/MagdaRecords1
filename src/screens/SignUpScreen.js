@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthContext } from '../services/auth';
+import { ThemeContext } from '../contexts/ThemeContext';
 import {
   validateEmail,
   validatePassword,
@@ -21,11 +22,15 @@ import {
   validateDateOfBirth,
 } from '../utils/validation';
 import colors from '../theme/colors';
+import darkColors from '../theme/darkColors';
 import typography from '../theme/typography';
 import spacing from '../theme/spacing';
 
 const SignUpScreen = ({ navigation }) => {
   const { register } = useContext(AuthContext);
+  const { isDarkMode } = useContext(ThemeContext);
+  const theme = isDarkMode ? darkColors : colors;
+
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState('');
@@ -40,7 +45,6 @@ const SignUpScreen = ({ navigation }) => {
   const firstNameRef = useRef(null);
 
   useEffect(() => {
-    // Auto-focus the first name input on mount
     if (firstNameRef.current) {
       setTimeout(() => firstNameRef.current.focus(), 300);
     }
@@ -119,15 +123,15 @@ const SignUpScreen = ({ navigation }) => {
 
   if (isLoading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={colors.primary} />
-        <Text style={styles.loadingText}>Creating your account...</Text>
+      <View style={[styles.loadingContainer, { backgroundColor: theme.background }]}>
+        <ActivityIndicator size="large" color={theme.primary} />
+        <Text style={[styles.loadingText, { color: theme.text }]}>Creating your account...</Text>
       </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.container}
@@ -137,65 +141,75 @@ const SignUpScreen = ({ navigation }) => {
           keyboardShouldPersistTaps="handled"
         >
           <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-            <Ionicons name="arrow-back" size={24} color={colors.primary} />
+            <Ionicons name="arrow-back" size={24} color={theme.primary} />
           </TouchableOpacity>
 
-          <Text style={styles.title}>Create an Account</Text>
-          <Text style={styles.subtitle}>
+          <Text style={[styles.title, { color: theme.text }]}>Create an Account</Text>
+          <Text style={[styles.subtitle, { color: theme.secondaryText }]}>
             Secure your medical records with a personal account
           </Text>
 
           <View style={styles.form}>
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>First Name</Text>
+              <Text style={[styles.label, { color: theme.text }]}>First Name</Text>
               <TextInput
                 ref={firstNameRef}
-                style={[styles.input, errors.firstName && styles.inputError]}
+                style={[
+                  styles.input,
+                  { color: theme.text, borderColor: errors.firstName ? theme.error : theme.border },
+                ]}
                 placeholder="Enter your first name"
+                placeholderTextColor={theme.secondaryText}
                 value={firstName}
                 onChangeText={setFirstName}
                 autoCapitalize="words"
                 returnKeyType="next"
               />
-              {errors.firstName && (
-                <Text style={styles.errorText}>{errors.firstName}</Text>
-              )}
+              {errors.firstName && <Text style={styles.errorText}>{errors.firstName}</Text>}
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Last Name</Text>
+              <Text style={[styles.label, { color: theme.text }]}>Last Name</Text>
               <TextInput
-                style={[styles.input, errors.lastName && styles.inputError]}
+                style={[
+                  styles.input,
+                  { color: theme.text, borderColor: errors.lastName ? theme.error : theme.border },
+                ]}
                 placeholder="Enter your last name"
+                placeholderTextColor={theme.secondaryText}
                 value={lastName}
                 onChangeText={setLastName}
                 autoCapitalize="words"
               />
-              {errors.lastName && (
-                <Text style={styles.errorText}>{errors.lastName}</Text>
-              )}
+              {errors.lastName && <Text style={styles.errorText}>{errors.lastName}</Text>}
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Date of Birth</Text>
+              <Text style={[styles.label, { color: theme.text }]}>Date of Birth</Text>
               <TextInput
-                style={[styles.input, errors.dateOfBirth && styles.inputError]}
+                style={[
+                  styles.input,
+                  { color: theme.text, borderColor: errors.dateOfBirth ? theme.error : theme.border },
+                ]}
                 placeholder="MM/DD/YYYY"
+                placeholderTextColor={theme.secondaryText}
                 value={dateOfBirth}
                 onChangeText={handleDateOfBirthChange}
                 keyboardType="numeric"
                 maxLength={10}
               />
-              {errors.dateOfBirth && (
-                <Text style={styles.errorText}>{errors.dateOfBirth}</Text>
-              )}
+              {errors.dateOfBirth && <Text style={styles.errorText}>{errors.dateOfBirth}</Text>}
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Email</Text>
+              <Text style={[styles.label, { color: theme.text }]}>Email</Text>
               <TextInput
-                style={[styles.input, errors.email && styles.inputError]}
+                style={[
+                  styles.input,
+                  { color: theme.text, borderColor: errors.email ? theme.error : theme.border },
+                ]}
                 placeholder="Enter your email address"
+                placeholderTextColor={theme.secondaryText}
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
@@ -205,11 +219,15 @@ const SignUpScreen = ({ navigation }) => {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Password</Text>
+              <Text style={[styles.label, { color: theme.text }]}>Password</Text>
               <View style={styles.passwordContainer}>
                 <TextInput
-                  style={[styles.passwordInput, errors.password && styles.inputError]}
+                  style={[
+                    styles.passwordInput,
+                    { color: theme.text, borderColor: errors.password ? theme.error : theme.border },
+                  ]}
                   placeholder="Create a password"
+                  placeholderTextColor={theme.secondaryText}
                   value={password}
                   onChangeText={setPassword}
                   secureTextEntry={!showPassword}
@@ -222,25 +240,30 @@ const SignUpScreen = ({ navigation }) => {
                   <Ionicons
                     name={showPassword ? 'eye-off-outline' : 'eye-outline'}
                     size={24}
-                    color={colors.gray}
+                    color={theme.gray}
                   />
                 </TouchableOpacity>
               </View>
-              {errors.password && (
-                <Text style={styles.errorText}>{errors.password}</Text>
-              )}
-              <Text style={styles.passwordHint}>
+              {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
+              <Text style={[styles.passwordHint, { color: theme.secondaryText }]}>
                 Password must contain at least 8 characters, including uppercase, lowercase,
                 number, and special character.
               </Text>
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Confirm Password</Text>
+              <Text style={[styles.label, { color: theme.text }]}>Confirm Password</Text>
               <View style={styles.passwordContainer}>
                 <TextInput
-                  style={[styles.passwordInput, errors.confirmPassword && styles.inputError]}
+                  style={[
+                    styles.passwordInput,
+                    {
+                      color: theme.text,
+                      borderColor: errors.confirmPassword ? theme.error : theme.border,
+                    },
+                  ]}
                   placeholder="Confirm your password"
+                  placeholderTextColor={theme.secondaryText}
                   value={confirmPassword}
                   onChangeText={setConfirmPassword}
                   secureTextEntry={!showConfirmPassword}
@@ -253,7 +276,7 @@ const SignUpScreen = ({ navigation }) => {
                   <Ionicons
                     name={showConfirmPassword ? 'eye-off-outline' : 'eye-outline'}
                     size={24}
-                    color={colors.gray}
+                    color={theme.gray}
                   />
                 </TouchableOpacity>
               </View>
@@ -262,14 +285,17 @@ const SignUpScreen = ({ navigation }) => {
               )}
             </View>
 
-            <TouchableOpacity style={styles.signUpButton} onPress={handleSignUp}>
-              <Text style={styles.signUpButtonText}>Create Account</Text>
+            <TouchableOpacity
+              style={[styles.signUpButton, { backgroundColor: theme.primary }]}
+              onPress={handleSignUp}
+            >
+              <Text style={[styles.signUpButtonText, { color: theme.white }]}>Create Account</Text>
             </TouchableOpacity>
 
             <View style={styles.loginContainer}>
-              <Text style={styles.loginText}>Already have an account?</Text>
+              <Text style={[styles.loginText, { color: theme.text }]}>Already have an account?</Text>
               <TouchableOpacity onPress={() => navigation.navigate('Landing')}>
-                <Text style={styles.loginLink}>Log In</Text>
+                <Text style={[styles.loginLink, { color: theme.primary }]}>Log In</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -280,8 +306,93 @@ const SignUpScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  // Keep your current styles (they are already good)
-  // If you'd like me to apply global font scaling or accessibility styles, let me know
+  container: {
+    flex: 1,
+  },
+  scrollContent: {
+    padding: spacing.medium,
+  },
+  backButton: {
+    marginBottom: spacing.medium,
+  },
+  title: {
+    ...typography.h1,
+    marginBottom: spacing.small,
+  },
+  subtitle: {
+    ...typography.body,
+    marginBottom: spacing.large,
+  },
+  form: {
+    marginTop: spacing.small,
+  },
+  inputGroup: {
+    marginBottom: spacing.medium,
+  },
+  label: {
+    ...typography.subtitle,
+    marginBottom: spacing.extraSmall,
+  },
+  input: {
+    ...typography.body,
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: spacing.small,
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderRadius: 8,
+  },
+  passwordInput: {
+    flex: 1,
+    padding: spacing.small,
+    ...typography.body,
+  },
+  eyeIcon: {
+    paddingHorizontal: spacing.small,
+  },
+  passwordHint: {
+    fontSize: 12,
+    marginTop: spacing.extraSmall,
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 12,
+    marginTop: spacing.extraSmall,
+  },
+  signUpButton: {
+    padding: spacing.medium,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: spacing.large,
+  },
+  signUpButtonText: {
+    ...typography.button,
+  },
+  loginContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: spacing.medium,
+  },
+  loginText: {
+    ...typography.body,
+  },
+  loginLink: {
+    ...typography.body,
+    marginLeft: 5,
+    fontWeight: 'bold',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    ...typography.body,
+    marginTop: spacing.medium,
+  },
 });
 
 export default SignUpScreen;

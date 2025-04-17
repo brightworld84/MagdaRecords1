@@ -15,15 +15,20 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthContext } from '../services/auth';
+import { ThemeContext } from '../contexts/ThemeContext';
 import { getProviders, saveProvider, deleteProvider } from '../services/storage';
 import ProviderCard from '../components/ProviderCard';
 import AccountSelector from '../components/AccountSelector';
 import colors from '../theme/colors';
+import darkColors from '../theme/darkColors';
 import typography from '../theme/typography';
 import spacing from '../theme/spacing';
 
 const ProvidersScreen = () => {
   const { state } = useContext(AuthContext);
+  const { isDarkMode } = useContext(ThemeContext);
+  const theme = isDarkMode ? darkColors : colors;
+
   const [selectedAccount, setSelectedAccount] = useState(null);
   const [accounts, setAccounts] = useState([]);
   const [providers, setProviders] = useState([]);
@@ -174,25 +179,25 @@ const ProvidersScreen = () => {
 
   const renderEmptyState = () => (
     <View style={styles.emptyStateContainer}>
-      <Ionicons name="people-outline" size={64} color={colors.lightGray} />
-      <Text style={styles.emptyStateTitle}>No Providers Found</Text>
-      <Text style={styles.emptyStateMessage}>
+      <Ionicons name="people-outline" size={64} color={theme.lightGray} />
+      <Text style={[styles.emptyStateTitle, { color: theme.text }]}>No Providers Found</Text>
+      <Text style={[styles.emptyStateMessage, { color: theme.secondaryText }]}>
         {searchText
           ? 'Try changing your search criteria.'
           : 'Add your healthcare providers to keep track of your care team.'}
       </Text>
       {!searchText && (
-        <TouchableOpacity style={styles.emptyStateButton} onPress={openAddModal}>
-          <Text style={styles.emptyStateButtonText}>Add Provider</Text>
+        <TouchableOpacity style={[styles.emptyStateButton, { backgroundColor: theme.primary }]} onPress={openAddModal}>
+          <Text style={[styles.emptyStateButtonText, { color: theme.white }]}>Add Provider</Text>
         </TouchableOpacity>
       )}
     </View>
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Healthcare Providers</Text>
+        <Text style={[styles.headerTitle, { color: theme.text }]}>Healthcare Providers</Text>
       </View>
 
       <AccountSelector
@@ -203,16 +208,17 @@ const ProvidersScreen = () => {
 
       <View style={styles.searchContainer}>
         <View style={styles.searchInputContainer}>
-          <Ionicons name="search" size={20} color={colors.gray} style={styles.searchIcon} />
+          <Ionicons name="search" size={20} color={theme.gray} style={styles.searchIcon} />
           <TextInput
-            style={styles.searchInput}
+            style={[styles.searchInput, { color: theme.text }]}
             placeholder="Search providers..."
+            placeholderTextColor={theme.secondaryText}
             value={searchText}
             onChangeText={setSearchText}
           />
           {searchText ? (
             <TouchableOpacity onPress={() => setSearchText('')}>
-              <Ionicons name="close-circle" size={20} color={colors.gray} />
+              <Ionicons name="close-circle" size={20} color={theme.gray} />
             </TouchableOpacity>
           ) : null}
         </View>
@@ -220,8 +226,8 @@ const ProvidersScreen = () => {
 
       {isLoading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={colors.primary} />
-          <Text style={styles.loadingText}>Loading providers...</Text>
+          <ActivityIndicator size="large" color={theme.primary} />
+          <Text style={[styles.loadingText, { color: theme.text }]}>Loading providers...</Text>
         </View>
       ) : (
         <FlatList
@@ -240,8 +246,8 @@ const ProvidersScreen = () => {
         />
       )}
 
-      <TouchableOpacity style={styles.addButton} onPress={openAddModal}>
-        <Ionicons name="add" size={28} color={colors.white} />
+      <TouchableOpacity style={[styles.addButton, { backgroundColor: theme.primary }]} onPress={openAddModal}>
+        <Ionicons name="add" size={28} color={theme.white} />
       </TouchableOpacity>
 
       <Modal
@@ -253,14 +259,15 @@ const ProvidersScreen = () => {
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={styles.modalContainer}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
         >
-          <View style={styles.modalContent}>
+          <View style={[styles.modalContent, { backgroundColor: theme.white }]}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>
+              <Text style={[styles.modalTitle, { color: theme.text }]}>
                 {currentProvider ? 'Edit Provider' : 'Add Provider'}
               </Text>
               <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
-                <Ionicons name="close" size={24} color={colors.text} />
+                <Ionicons name="close" size={24} color={theme.text} />
               </TouchableOpacity>
             </View>
             {/* form code remains unchanged */}
@@ -272,7 +279,101 @@ const ProvidersScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  // unchanged styles
+  container: {
+    flex: 1,
+  },
+  header: {
+    padding: spacing.medium,
+  },
+  headerTitle: {
+    ...typography.h2,
+  },
+  searchContainer: {
+    paddingHorizontal: spacing.medium,
+    marginBottom: spacing.medium,
+  },
+  searchInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#eee',
+    borderRadius: 8,
+    paddingHorizontal: spacing.medium,
+    paddingVertical: 8,
+  },
+  searchIcon: {
+    marginRight: 8,
+  },
+  searchInput: {
+    flex: 1,
+    ...typography.body,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    ...typography.body,
+    marginTop: spacing.medium,
+  },
+  providersList: {
+    padding: spacing.medium,
+  },
+  separator: {
+    height: spacing.small,
+  },
+  addButton: {
+    position: 'absolute',
+    right: spacing.large,
+    bottom: spacing.large,
+    padding: spacing.medium,
+    borderRadius: 50,
+    elevation: 2,
+  },
+  emptyStateContainer: {
+    alignItems: 'center',
+    padding: spacing.large,
+  },
+  emptyStateTitle: {
+    ...typography.h3,
+    marginTop: spacing.medium,
+  },
+  emptyStateMessage: {
+    ...typography.body,
+    textAlign: 'center',
+    marginTop: spacing.small,
+    marginBottom: spacing.medium,
+  },
+  emptyStateButton: {
+    paddingVertical: spacing.small,
+    paddingHorizontal: spacing.large,
+    borderRadius: 8,
+  },
+  emptyStateButtonText: {
+    ...typography.button,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    padding: spacing.medium,
+  },
+  modalContent: {
+    borderRadius: 12,
+    padding: spacing.large,
+    elevation: 5,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: spacing.medium,
+  },
+  modalTitle: {
+    ...typography.h3,
+  },
+  closeButton: {
+    padding: spacing.small,
+  },
 });
 
 export default ProvidersScreen;
