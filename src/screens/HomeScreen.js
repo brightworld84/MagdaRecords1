@@ -9,7 +9,6 @@ import {
   SafeAreaView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
 import { AuthContext } from '../services/auth';
 import { getRecentRecords } from '../services/storage';
 import { analyzeMedicationInteractions, getHealthRecommendations } from '../services/ai';
@@ -21,8 +20,7 @@ import colors from '../theme/colors';
 import typography from '../theme/typography';
 import spacing from '../theme/spacing';
 
-const HomeScreen = () => {
-  const navigation = useNavigation();
+const HomeScreen = ({ navigation }) => {
   const { state } = useContext(AuthContext);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [recentRecords, setRecentRecords] = useState([]);
@@ -32,12 +30,9 @@ const HomeScreen = () => {
   const [accounts, setAccounts] = useState([]);
 
   useEffect(() => {
-    // Set the current user as default selected account
     if (state.user) {
       setSelectedAccount(state.user.id);
-      
-      // In a real app, we would fetch linked accounts
-      // For this demo, we'll create some mock accounts based on the current user
+
       if (state.user.firstName) {
         const mockAccounts = [
           { id: state.user.id, name: `${state.user.firstName} ${state.user.lastName}`, isPrimary: true },
@@ -47,10 +42,10 @@ const HomeScreen = () => {
         setAccounts(mockAccounts);
       }
     }
-    
+
     loadData();
   }, [state.user]);
-  
+
   useEffect(() => {
     if (selectedAccount) {
       loadData();
@@ -59,16 +54,13 @@ const HomeScreen = () => {
 
   const loadData = async () => {
     try {
-      // Get recent records for the selected account
       const records = await getRecentRecords(selectedAccount);
       setRecentRecords(records);
-      
-      // Get medication interactions from AI
+
       if (records.length > 0) {
         const interactions = await analyzeMedicationInteractions(records);
         setMedicationInteractions(interactions);
-        
-        // Get health recommendations from AI
+
         const recommendations = await getHealthRecommendations(records);
         setHealthRecommendations(recommendations);
       } else {
@@ -88,10 +80,6 @@ const HomeScreen = () => {
 
   const handleAccountChange = (accountId) => {
     setSelectedAccount(accountId);
-  };
-
-  const handleOpenMenu = () => {
-    navigation.openDrawer();
   };
 
   const handleViewAllRecords = () => {
@@ -116,22 +104,12 @@ const HomeScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleOpenMenu} style={styles.menuButton}>
-          <Ionicons name="menu" size={28} color={colors.primary} />
-        </TouchableOpacity>
-        
-        <Text style={styles.headerTitle}>Home</Text>
-        
-        <View style={styles.placeholder} />
-      </View>
-      
       <AccountSelector 
         accounts={accounts} 
         selectedAccount={selectedAccount}
         onSelectAccount={handleAccountChange}
       />
-      
+
       <ScrollView
         style={styles.content}
         refreshControl={
@@ -151,14 +129,14 @@ const HomeScreen = () => {
                   <Text style={styles.viewAllText}>View All</Text>
                 </TouchableOpacity>
               </View>
-              
+
               <View style={styles.recordsContainer}>
                 {recentRecords.slice(0, 3).map((record) => (
                   <RecordCard key={record.id} record={record} />
                 ))}
               </View>
             </View>
-            
+
             {medicationInteractions.length > 0 && (
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Potential Medication Interactions</Text>
@@ -169,7 +147,7 @@ const HomeScreen = () => {
                 </View>
               </View>
             )}
-            
+
             {healthRecommendations.length > 0 && (
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Health Recommendations</Text>
@@ -193,26 +171,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing.medium,
-    paddingVertical: spacing.medium,
-    backgroundColor: colors.white,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.lightGray,
-  },
-  menuButton: {
-    padding: spacing.small,
-  },
-  headerTitle: {
-    ...typography.h2,
-    color: colors.text,
-  },
-  placeholder: {
-    width: 40, // Same width as menu button for proper alignment
   },
   content: {
     flex: 1,
@@ -244,16 +202,12 @@ const styles = StyleSheet.create({
     color: colors.primary,
   },
   recordsContainer: {
-    // gap: spacing.medium,
     marginBottom: spacing.medium,
   },  
   interactionsContainer: {
-    // gap: spacing.medium,
     marginBottom: spacing.medium,
   },
-  
   recommendationsContainer: {
-    // gap: spacing.medium,
     marginBottom: spacing.medium,
   },  
   emptyStateContainer: {
