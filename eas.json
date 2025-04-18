@@ -11,13 +11,23 @@
     "preview": {
       "distribution": "store",
       "ios": {
-        "simulator": false
+        "simulator": false,
+        "buildNumber": "1.0.4"
+      },
+      "android": {
+        "versionCode": 4
       }
     },
     "production": {
-      "autoIncrement": true,
+      "autoIncrement": false,
       "developmentClient": false,
-      "distribution": "store"
+      "distribution": "store",
+      "ios": {
+        "buildNumber": "1.0.4"
+      },
+      "android": {
+        "versionCode": 4
+      }
     }
   },
   "submit": {

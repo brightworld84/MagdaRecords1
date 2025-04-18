@@ -2,7 +2,7 @@
   "expo": {
     "name": "MagdaRecords",
     "slug": "magdarecords",
-    "version": "1.0.0",
+    "version": "1.0.4",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -16,11 +16,12 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.magdarecords"
+      "bundleIdentifier": "com.anonymous.magdarecords",
+      "buildNumber": "1.0.4"
     },
     "android": {
       "package": "com.anonymous.magdarecords",
-      "versionCode": 1,
+      "versionCode": 4,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#ffffff"
