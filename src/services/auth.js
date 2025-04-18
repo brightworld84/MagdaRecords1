@@ -6,7 +6,6 @@ import * as LocalAuthentication from 'expo-local-authentication';
 import { encryptData, decryptData } from '../utils/encryption';
 import { AUTH_KEYS } from '../utils/constants';
 
-// Initial state
 const initialState = {
   isAuthenticated: false,
   user: null,
@@ -14,7 +13,6 @@ const initialState = {
   error: null,
 };
 
-// Create context
 export const AuthContext = createContext({
   ...initialState,
   register: () => {},
@@ -24,46 +22,23 @@ export const AuthContext = createContext({
   updateUser: () => {},
 });
 
-// Reducer function
 const authReducer = (state, action) => {
   switch (action.type) {
     case 'LOGIN':
-      return {
-        ...state,
-        isAuthenticated: true,
-        user: action.payload,
-        error: null,
-      };
+      return { ...state, isAuthenticated: true, user: action.payload, error: null };
     case 'LOGOUT':
-      return {
-        ...state,
-        isAuthenticated: false,
-        user: null,
-      };
+      return { ...state, isAuthenticated: false, user: null };
     case 'AUTH_ERROR':
-      return {
-        ...state,
-        error: action.payload,
-      };
+      return { ...state, error: action.payload };
     case 'UPDATE_USER':
-      return {
-        ...state,
-        user: {
-          ...state.user,
-          ...action.payload,
-        },
-      };
+      return { ...state, user: { ...state.user, ...action.payload } };
     case 'SET_LOADING':
-      return {
-        ...state,
-        isLoading: action.payload,
-      };
+      return { ...state, isLoading: action.payload };
     default:
       return state;
   }
 };
 
-// Auth provider component
 export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
@@ -97,13 +72,14 @@ export const AuthProvider = ({ children }) => {
       };
       const encryptedUserData = await encryptData(JSON.stringify(newUser));
       await SecureStore.setItemAsync(AUTH_KEYS.USER_DATA, encryptedUserData);
+
+      // ✅ FIX: Automatically log the user in after registration
+      dispatch({ type: 'LOGIN', payload: newUser });
+
       return newUser;
     } catch (error) {
       console.error('Registration error:', error);
-      dispatch({
-        type: 'AUTH_ERROR',
-        payload: error.message || 'Failed to register. Please try again.',
-      });
+      dispatch({ type: 'AUTH_ERROR', payload: error.message || 'Failed to register.' });
       throw error;
     }
   };
@@ -126,10 +102,7 @@ export const AuthProvider = ({ children }) => {
       return testUser;
     } catch (error) {
       console.error('Login error:', error);
-      dispatch({
-        type: 'AUTH_ERROR',
-        payload: error.message || 'Failed to login. Please check your credentials.',
-      });
+      dispatch({ type: 'AUTH_ERROR', payload: error.message || 'Login failed.' });
       throw error;
     }
   };
@@ -144,10 +117,7 @@ export const AuthProvider = ({ children }) => {
       dispatch({ type: 'LOGIN', payload: userData });
     } catch (error) {
       console.error('Biometric auth error:', error);
-      dispatch({
-        type: 'AUTH_ERROR',
-        payload: error.message || 'Biometric authentication failed.',
-      });
+      dispatch({ type: 'AUTH_ERROR', payload: error.message || 'Biometric auth failed' });
       throw error;
     }
   };
@@ -159,10 +129,7 @@ export const AuthProvider = ({ children }) => {
       dispatch({ type: 'UPDATE_USER', payload: userData });
     } catch (error) {
       console.error('Update user error:', error);
-      dispatch({
-        type: 'AUTH_ERROR',
-        payload: error.message || 'Failed to update user information.',
-      });
+      dispatch({ type: 'AUTH_ERROR', payload: error.message || 'Update failed' });
       throw error;
     }
   };
@@ -192,7 +159,6 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// Get OpenAI API Key (used by AI features)
 export const getApiKey = async () => {
   try {
     const encryptedKey = await SecureStore.getItemAsync(AUTH_KEYS.OPENAI_API_KEY);
