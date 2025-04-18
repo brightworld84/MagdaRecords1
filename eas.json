@@ -11,13 +11,17 @@
     "preview": {
       "distribution": "store",
       "ios": {
-        "simulator": false
+        "simulator": false,
+        "buildNumber": "5"
       }
     },
     "production": {
       "autoIncrement": true,
       "developmentClient": false,
-      "distribution": "store"
+      "distribution": "store",
+      "ios": {
+        "buildNumber": "5"
+      }
     }
   },
   "submit": {
