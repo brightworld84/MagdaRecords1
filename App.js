@@ -13,7 +13,6 @@ import {
 import { NavigationContainer } from '@react-navigation/native';
 import { ThemeProvider, useTheme } from './src/theme/themeContext';
 
-// Ignore specific warnings that might be coming from dependencies
 LogBox.ignoreLogs([
   'Warning: ...',
   'Possible Unhandled Promise Rejection',
@@ -21,9 +20,20 @@ LogBox.ignoreLogs([
 
 console.log('App is initializing...');
 
+// Separate component to safely use ThemeContext
+function InnerAppContent() {
+  const { theme, isDark } = useTheme();
+
+  return (
+    <NavigationContainer>
+      <StatusBar style={isDark ? 'light' : 'dark'} />
+      <AppNavigator />
+    </NavigationContainer>
+  );
+}
+
 function AppContent() {
   const [isReady, setIsReady] = useState(false);
-  const { theme, isDark } = useTheme();
 
   useEffect(() => {
     const prepare = async () => {
@@ -46,14 +56,14 @@ function AppContent() {
           flex: 1,
           alignItems: 'center',
           justifyContent: 'center',
-          backgroundColor: theme.background,
+          backgroundColor: '#ffffff',
         }}
       >
-        <ActivityIndicator size="large" color={theme.primary} />
+        <ActivityIndicator size="large" color="#007aff" />
         <Text
           style={{
             marginTop: 10,
-            color: theme.text,
+            color: '#333',
             fontWeight: '500',
           }}
         >
@@ -63,12 +73,7 @@ function AppContent() {
     );
   }
 
-  return (
-    <NavigationContainer>
-      <StatusBar style={isDark ? 'light' : 'dark'} />
-      <AppNavigator />
-    </NavigationContainer>
-  );
+  return <InnerAppContent />;
 }
 
 export default function App() {
