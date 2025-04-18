@@ -47,7 +47,7 @@ const MainTabs = ({ theme }) => (
         fontWeight: '500',
       },
       tabBarStyle: {
-        backgroundColor: theme.card,
+        backgroundColor: theme.cardBg,
         borderTopColor: theme.lightGray,
         paddingTop: 5,
         height: 70,
@@ -113,7 +113,7 @@ const MainDrawer = ({ theme }) => (
     drawerContent={(props) => <DrawerContent {...props} />}
     screenOptions={{
       headerStyle: {
-        backgroundColor: theme.card,
+        backgroundColor: theme.cardBg,
         elevation: 6,
         shadowColor: theme.shadow,
         shadowOffset: { width: 0, height: 2 },
@@ -127,7 +127,7 @@ const MainDrawer = ({ theme }) => (
         fontWeight: 'bold',
       },
       drawerStyle: {
-        backgroundColor: theme.card,
+        backgroundColor: theme.cardBg,
         width: 280,
       },
     }}
