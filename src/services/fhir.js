@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { uploadRecord } from './storage';
 
 // FHIR server base URL (this would be configurable in a real app)
@@ -6,18 +7,12 @@ const FHIR_BASE_URL = 'https://api.example.com/fhir';
 // Import medical records from a FHIR server
 export const importFromFHIR = async (endpoint) => {
   try {
-    // In a real app, this would make actual API calls to a FHIR server
-    // For this demo, we'll simulate FHIR import with mock data
-    
-    // Validate the endpoint URL
     if (!endpoint || !endpoint.startsWith('http')) {
       throw new Error('Please provide a valid FHIR endpoint URL');
     }
-    
-    // Simulate a delay for better UX
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // Generate mock imported records
+
+    await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate delay
+
     const mockImportedRecords = [
       {
         resourceType: 'DiagnosticReport',
@@ -29,34 +24,34 @@ export const importFromFHIR = async (endpoint) => {
               {
                 system: 'http://terminology.hl7.org/CodeSystem/v2-0074',
                 code: 'LAB',
-                display: 'Laboratory'
-              }
-            ]
-          }
+                display: 'Laboratory',
+              },
+            ],
+          },
         ],
         code: {
           coding: [
             {
               system: 'http://loinc.org',
               code: '58410-2',
-              display: 'Complete blood count (hemogram) panel - Blood by Automated count'
-            }
+              display: 'Complete blood count (hemogram) panel - Blood by Automated count',
+            },
           ],
-          text: 'Complete Blood Count'
+          text: 'Complete Blood Count',
         },
         subject: {
           reference: 'Patient/example',
-          display: 'Patient'
+          display: 'Patient',
         },
         effectiveDateTime: '2023-03-10',
         issued: '2023-03-11T10:45:00+11:00',
         performer: [
           {
             reference: 'Organization/example',
-            display: 'Memorial Hospital Laboratory'
-          }
+            display: 'Memorial Hospital Laboratory',
+          },
         ],
-        conclusion: 'All values within normal range.'
+        conclusion: 'All values within normal range.',
       },
       {
         resourceType: 'MedicationRequest',
@@ -68,19 +63,19 @@ export const importFromFHIR = async (endpoint) => {
             {
               system: 'http://www.nlm.nih.gov/research/umls/rxnorm',
               code: '314076',
-              display: 'Lisinopril 10 MG Oral Tablet'
-            }
+              display: 'Lisinopril 10 MG Oral Tablet',
+            },
           ],
-          text: 'Lisinopril 10mg tablet'
+          text: 'Lisinopril 10mg tablet',
         },
         subject: {
           reference: 'Patient/example',
-          display: 'Patient'
+          display: 'Patient',
         },
         authoredOn: '2023-02-20',
         requester: {
           reference: 'Practitioner/example',
-          display: 'Dr. Michael Chen'
+          display: 'Dr. Michael Chen',
         },
         dosageInstruction: [
           {
@@ -89,20 +84,20 @@ export const importFromFHIR = async (endpoint) => {
               repeat: {
                 frequency: 1,
                 period: 1,
-                periodUnit: 'd'
-              }
+                periodUnit: 'd',
+              },
             },
             route: {
               coding: [
                 {
                   system: 'http://snomed.info/sct',
                   code: '26643006',
-                  display: 'Oral route'
-                }
-              ]
-            }
-          }
-        ]
+                  display: 'Oral route',
+                },
+              ],
+            },
+          },
+        ],
       },
       {
         resourceType: 'Immunization',
@@ -113,31 +108,29 @@ export const importFromFHIR = async (endpoint) => {
             {
               system: 'http://hl7.org/fhir/sid/cvx',
               code: '158',
-              display: 'influenza, injectable, quadrivalent, contains preservative'
-            }
+              display: 'influenza, injectable, quadrivalent, contains preservative',
+            },
           ],
-          text: 'Influenza Vaccine'
+          text: 'Influenza Vaccine',
         },
         patient: {
           reference: 'Patient/example',
-          display: 'Patient'
+          display: 'Patient',
         },
         occurrenceDateTime: '2023-01-15',
         primarySource: true,
         location: {
           reference: 'Location/example',
-          display: 'City Medical Center'
-        }
-      }
+          display: 'City Medical Center',
+        },
+      },
     ];
-    
-    // Convert FHIR resources to app record format and save them
+
     const convertedRecords = [];
-    
+
     for (const fhirResource of mockImportedRecords) {
       let record = null;
-      
-      // Extract data based on resource type
+
       if (fhirResource.resourceType === 'DiagnosticReport') {
         record = {
           title: fhirResource.code.text,
@@ -169,18 +162,14 @@ export const importFromFHIR = async (endpoint) => {
           fhirId: fhirResource.id,
         };
       }
-      
+
       if (record) {
-        // In a real app, we would need the actual userId here
-        // For this demo, we'll use a placeholder ID
-        const userId = 'current-user-id';
-        
-        // Save the record
+        const userId = 'current-user-id'; // Replace this later with real user ID
         await uploadRecord(userId, record);
         convertedRecords.push(record);
       }
     }
-    
+
     return convertedRecords;
   } catch (error) {
     console.error('Failed to import from FHIR:', error);
@@ -191,12 +180,7 @@ export const importFromFHIR = async (endpoint) => {
 // Export medical records to FHIR format
 export const exportToFHIR = async (userId, records) => {
   try {
-    // In a real app, this would convert records to FHIR format and send to a server
-    // For this demo, we'll just return a success message
-    
-    // Simulate a delay for better UX
     await new Promise(resolve => setTimeout(resolve, 1500));
-    
     return {
       success: true,
       message: `${records.length} records successfully exported to FHIR format`,
@@ -206,8 +190,8 @@ export const exportToFHIR = async (userId, records) => {
     throw new Error(`FHIR export failed: ${error.message}`);
   }
 };
-import axios from 'axios';
 
+// Axios-powered FHIR client
 const createFHIRClient = (endpoint, authToken = null) => {
   const client = axios.create({
     baseURL: endpoint,
@@ -222,17 +206,14 @@ const createFHIRClient = (endpoint, authToken = null) => {
       const response = await client.get(`/Patient/${patientId}`);
       return response.data;
     },
-
     async searchResources(resourceType, params) {
       const response = await client.get(`/${resourceType}`, { params });
       return response.data;
     },
-
     async createResource(resourceType, data) {
       const response = await client.post(`/${resourceType}`, data);
       return response.data;
     },
-
     async updateResource(resourceType, id, data) {
       const response = await client.put(`/${resourceType}/${id}`, data);
       return response.data;

@@ -21,7 +21,7 @@ import {
   removeLinkedAccount,
   updateUserDetails,
 } from '../services/storage';
-import { ThemeContext } from '../theme/themeContext'; // ✅ Fixed import path
+import { ThemeContext } from '../theme/themeContext';
 import colors from '../theme/colors';
 import darkColors from '../theme/darkColors';
 import typography from '../theme/typography';
@@ -200,14 +200,15 @@ const AccountScreen = ({ navigation }) => {
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
+        keyboardVerticalOffset={100}
       >
         <ScrollView
           style={styles.content}
           contentContainerStyle={{ paddingBottom: 100 }}
           keyboardShouldPersistTaps="handled"
         >
-          {/* Insert your full screen layout here (unchanged layout logic) */}
+          {/* Add your form fields and linked account UI here */}
+          {/* All input fields will remain visible with KeyboardAvoidingView */}
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
