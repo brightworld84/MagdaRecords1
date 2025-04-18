@@ -28,7 +28,13 @@ import spacing from '../theme/spacing';
 
 const SignUpScreen = ({ navigation }) => {
   const { register } = useContext(AuthContext);
-  const { isDarkMode } = useContext(ThemeContext);
+  const themeContext = useContext(ThemeContext);
+
+  if (!themeContext) {
+    console.warn('ThemeContext is unavailable — using light theme fallback');
+  }
+
+  const isDarkMode = themeContext?.isDarkMode ?? false;
   const theme = isDarkMode ? darkColors : colors;
 
   const [firstName, setFirstName] = useState('');
@@ -150,30 +156,31 @@ const SignUpScreen = ({ navigation }) => {
           </Text>
 
           <View style={styles.form}>
+            {/* First Name */}
             <View style={styles.inputGroup}>
               <Text style={[styles.label, { color: theme.text }]}>First Name</Text>
               <TextInput
                 ref={firstNameRef}
                 style={[
                   styles.input,
-                  { color: theme.text, borderColor: errors.firstName ? theme.error : theme.border },
+                  { color: theme.text, borderColor: errors.firstName ? theme.error : theme.inputBorder },
                 ]}
                 placeholder="Enter your first name"
                 placeholderTextColor={theme.secondaryText}
                 value={firstName}
                 onChangeText={setFirstName}
                 autoCapitalize="words"
-                returnKeyType="next"
               />
               {errors.firstName && <Text style={styles.errorText}>{errors.firstName}</Text>}
             </View>
 
+            {/* Last Name */}
             <View style={styles.inputGroup}>
               <Text style={[styles.label, { color: theme.text }]}>Last Name</Text>
               <TextInput
                 style={[
                   styles.input,
-                  { color: theme.text, borderColor: errors.lastName ? theme.error : theme.border },
+                  { color: theme.text, borderColor: errors.lastName ? theme.error : theme.inputBorder },
                 ]}
                 placeholder="Enter your last name"
                 placeholderTextColor={theme.secondaryText}
@@ -184,12 +191,13 @@ const SignUpScreen = ({ navigation }) => {
               {errors.lastName && <Text style={styles.errorText}>{errors.lastName}</Text>}
             </View>
 
+            {/* DOB */}
             <View style={styles.inputGroup}>
               <Text style={[styles.label, { color: theme.text }]}>Date of Birth</Text>
               <TextInput
                 style={[
                   styles.input,
-                  { color: theme.text, borderColor: errors.dateOfBirth ? theme.error : theme.border },
+                  { color: theme.text, borderColor: errors.dateOfBirth ? theme.error : theme.inputBorder },
                 ]}
                 placeholder="MM/DD/YYYY"
                 placeholderTextColor={theme.secondaryText}
@@ -201,12 +209,13 @@ const SignUpScreen = ({ navigation }) => {
               {errors.dateOfBirth && <Text style={styles.errorText}>{errors.dateOfBirth}</Text>}
             </View>
 
+            {/* Email */}
             <View style={styles.inputGroup}>
               <Text style={[styles.label, { color: theme.text }]}>Email</Text>
               <TextInput
                 style={[
                   styles.input,
-                  { color: theme.text, borderColor: errors.email ? theme.error : theme.border },
+                  { color: theme.text, borderColor: errors.email ? theme.error : theme.inputBorder },
                 ]}
                 placeholder="Enter your email address"
                 placeholderTextColor={theme.secondaryText}
@@ -218,13 +227,14 @@ const SignUpScreen = ({ navigation }) => {
               {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
             </View>
 
+            {/* Password */}
             <View style={styles.inputGroup}>
               <Text style={[styles.label, { color: theme.text }]}>Password</Text>
               <View style={styles.passwordContainer}>
                 <TextInput
                   style={[
                     styles.passwordInput,
-                    { color: theme.text, borderColor: errors.password ? theme.error : theme.border },
+                    { color: theme.text, borderColor: errors.password ? theme.error : theme.inputBorder },
                   ]}
                   placeholder="Create a password"
                   placeholderTextColor={theme.secondaryText}
@@ -251,6 +261,7 @@ const SignUpScreen = ({ navigation }) => {
               </Text>
             </View>
 
+            {/* Confirm Password */}
             <View style={styles.inputGroup}>
               <Text style={[styles.label, { color: theme.text }]}>Confirm Password</Text>
               <View style={styles.passwordContainer}>
@@ -259,7 +270,7 @@ const SignUpScreen = ({ navigation }) => {
                     styles.passwordInput,
                     {
                       color: theme.text,
-                      borderColor: errors.confirmPassword ? theme.error : theme.border,
+                      borderColor: errors.confirmPassword ? theme.error : theme.inputBorder,
                     },
                   ]}
                   placeholder="Confirm your password"
@@ -306,9 +317,7 @@ const SignUpScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
+  container: { flex: 1 },
   scrollContent: {
     padding: spacing.medium,
   },

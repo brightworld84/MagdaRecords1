@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthContext } from '../services/auth';
-import { ThemeContext } from '../theme/themeContext'; // ✅ Updated import path
+import { ThemeContext } from '../theme/themeContext';
 import { getRecentRecords } from '../services/storage';
 import { analyzeMedicationInteractions, getHealthRecommendations } from '../services/ai';
 import RecordCard from '../components/RecordCard';
@@ -26,7 +26,13 @@ import spacing from '../theme/spacing';
 
 const HomeScreen = ({ navigation }) => {
   const { state } = useContext(AuthContext);
-  const { isDarkMode } = useContext(ThemeContext);
+  const themeContext = useContext(ThemeContext);
+
+  if (!themeContext) {
+    console.warn('ThemeContext is unavailable — defaulting to light theme');
+  }
+
+  const isDarkMode = themeContext?.isDarkMode ?? false;
   const theme = isDarkMode ? darkColors : colors;
 
   const [isRefreshing, setIsRefreshing] = useState(false);

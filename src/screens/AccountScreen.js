@@ -29,7 +29,13 @@ import spacing from '../theme/spacing';
 
 const AccountScreen = ({ navigation }) => {
   const { state, updateUser, logout } = useContext(AuthContext);
-  const { isDarkMode } = useContext(ThemeContext);
+  const themeContext = useContext(ThemeContext);
+
+  if (!themeContext) {
+    console.warn('ThemeContext is unavailable — defaulting to light theme');
+  }
+
+  const isDarkMode = themeContext?.isDarkMode ?? false;
   const theme = isDarkMode ? darkColors : colors;
 
   const [isEditing, setIsEditing] = useState(false);
@@ -208,7 +214,6 @@ const AccountScreen = ({ navigation }) => {
           keyboardShouldPersistTaps="handled"
         >
           {/* Add your form fields and linked account UI here */}
-          {/* All input fields will remain visible with KeyboardAvoidingView */}
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

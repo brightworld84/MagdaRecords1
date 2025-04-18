@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthContext } from '../services/auth';
-import { ThemeContext } from '../theme/themeContext'; // ✅ corrected import
+import { ThemeContext } from '../theme/themeContext';
 import { getAllRecords } from '../services/storage';
 import RecordCard from '../components/RecordCard';
 import RecordFilter from '../components/RecordFilter';
@@ -25,7 +25,13 @@ import spacing from '../theme/spacing';
 
 const RecordsScreen = () => {
   const { state } = useContext(AuthContext);
-  const { isDarkMode } = useContext(ThemeContext);
+  const themeContext = useContext(ThemeContext);
+
+  if (!themeContext) {
+    console.warn('ThemeContext is unavailable — falling back to light theme.');
+  }
+
+  const isDarkMode = themeContext?.isDarkMode ?? false;
   const theme = isDarkMode ? darkColors : colors;
 
   const [records, setRecords] = useState([]);

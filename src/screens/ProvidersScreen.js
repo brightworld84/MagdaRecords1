@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthContext } from '../services/auth';
-import { ThemeContext } from '../theme/themeContext'; // ✅ fixed path
+import { ThemeContext } from '../theme/themeContext';
 import { getProviders, saveProvider, deleteProvider } from '../services/storage';
 import ProviderCard from '../components/ProviderCard';
 import AccountSelector from '../components/AccountSelector';
@@ -26,7 +26,13 @@ import spacing from '../theme/spacing';
 
 const ProvidersScreen = () => {
   const { state } = useContext(AuthContext);
-  const { isDarkMode } = useContext(ThemeContext);
+  const themeContext = useContext(ThemeContext);
+
+  if (!themeContext) {
+    console.warn('ThemeContext is unavailable — defaulting to light theme');
+  }
+
+  const isDarkMode = themeContext?.isDarkMode ?? false;
   const theme = isDarkMode ? darkColors : colors;
 
   const [selectedAccount, setSelectedAccount] = useState(null);
@@ -196,14 +202,225 @@ const ProvidersScreen = () => {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
-      {/* ... unchanged layout and modal remains intact */}
-      {/* This entire file remains structurally the same with just the fixed ThemeContext import */}
+      <AccountSelector
+        accounts={accounts}
+        selectedAccount={selectedAccount}
+        onSelectAccount={handleAccountChange}
+      />
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={100}
+      >
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={[styles.searchInput, { backgroundColor: theme.white, color: theme.text, borderColor: theme.lightGray }]}
+            placeholder="Search providers..."
+            placeholderTextColor={theme.secondaryText}
+            value={searchText}
+            onChangeText={setSearchText}
+          />
+        </View>
+
+        {isLoading ? (
+          <ActivityIndicator size="large" color={theme.primary} style={{ marginTop: 50 }} />
+        ) : (
+          <FlatList
+            data={filteredProviders}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <ProviderCard
+                provider={item}
+                onEdit={() => openEditModal(item)}
+                onDelete={() => handleDeleteProvider(item.id)}
+              />
+            )}
+            ListEmptyComponent={renderEmptyState}
+            contentContainerStyle={{ padding: spacing.medium }}
+            keyboardShouldPersistTaps="handled"
+          />
+        )}
+
+        <TouchableOpacity
+          style={[styles.fab, { backgroundColor: theme.primary }]}
+          onPress={openAddModal}
+        >
+          <Ionicons name="add" size={28} color={theme.white} />
+        </TouchableOpacity>
+
+        <Modal
+          visible={modalVisible}
+          animationType="slide"
+          transparent
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <View style={styles.modalBackdrop}>
+            <View style={[styles.modalContainer, { backgroundColor: theme.white }]}>
+              <Text style={[styles.modalTitle, { color: theme.text }]}>
+                {currentProvider ? 'Edit Provider' : 'Add Provider'}
+              </Text>
+
+              <TextInput
+                placeholder="Name"
+                value={name}
+                onChangeText={setName}
+                style={[styles.input, { borderColor: theme.lightGray, color: theme.text }]}
+                placeholderTextColor={theme.secondaryText}
+              />
+              {formErrors.name && <Text style={styles.errorText}>{formErrors.name}</Text>}
+
+              <TextInput
+                placeholder="Specialty"
+                value={specialty}
+                onChangeText={setSpecialty}
+                style={[styles.input, { borderColor: theme.lightGray, color: theme.text }]}
+                placeholderTextColor={theme.secondaryText}
+              />
+              <TextInput
+                placeholder="Facility"
+                value={facility}
+                onChangeText={setFacility}
+                style={[styles.input, { borderColor: theme.lightGray, color: theme.text }]}
+                placeholderTextColor={theme.secondaryText}
+              />
+              <TextInput
+                placeholder="Phone"
+                value={phone}
+                onChangeText={setPhone}
+                keyboardType="phone-pad"
+                style={[styles.input, { borderColor: theme.lightGray, color: theme.text }]}
+                placeholderTextColor={theme.secondaryText}
+              />
+              {formErrors.phone && <Text style={styles.errorText}>{formErrors.phone}</Text>}
+
+              <TextInput
+                placeholder="Address"
+                value={address}
+                onChangeText={setAddress}
+                style={[styles.input, { borderColor: theme.lightGray, color: theme.text }]}
+                placeholderTextColor={theme.secondaryText}
+              />
+              <TextInput
+                placeholder="Notes"
+                value={notes}
+                onChangeText={setNotes}
+                style={[styles.input, { borderColor: theme.lightGray, color: theme.text, height: 80 }]}
+                placeholderTextColor={theme.secondaryText}
+                multiline
+              />
+
+              <View style={styles.modalActions}>
+                <TouchableOpacity style={styles.cancelButton} onPress={() => setModalVisible(false)}>
+                  <Text style={[styles.cancelText, { color: theme.primary }]}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.saveButton, { backgroundColor: theme.primary }]} onPress={handleSubmit}>
+                  <Text style={[styles.saveText, { color: theme.white }]}>
+                    {currentProvider ? 'Update' : 'Save'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  // same styles as before
+  container: { flex: 1 },
+  searchContainer: {
+    padding: spacing.medium,
+  },
+  searchInput: {
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: spacing.medium,
+    paddingVertical: spacing.small,
+    fontSize: 16,
+  },
+  fab: {
+    position: 'absolute',
+    bottom: spacing.large,
+    right: spacing.large,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 4,
+  },
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    padding: spacing.medium,
+  },
+  modalContainer: {
+    borderRadius: 12,
+    padding: spacing.large,
+  },
+  modalTitle: {
+    ...typography.h2,
+    marginBottom: spacing.medium,
+  },
+  input: {
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: spacing.medium,
+    paddingVertical: spacing.small,
+    marginBottom: spacing.small,
+  },
+  modalActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginTop: spacing.medium,
+  },
+  cancelButton: {
+    marginRight: spacing.medium,
+  },
+  cancelText: {
+    ...typography.button,
+  },
+  saveButton: {
+    borderRadius: 8,
+    paddingHorizontal: spacing.large,
+    paddingVertical: spacing.medium,
+  },
+  saveText: {
+    ...typography.button,
+    textAlign: 'center',
+  },
+  emptyStateContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: spacing.extraLarge,
+    padding: spacing.large,
+  },
+  emptyStateTitle: {
+    ...typography.h3,
+    marginTop: spacing.medium,
+  },
+  emptyStateMessage: {
+    ...typography.body,
+    textAlign: 'center',
+    marginTop: spacing.small,
+  },
+  emptyStateButton: {
+    marginTop: spacing.medium,
+    paddingHorizontal: spacing.large,
+    paddingVertical: spacing.medium,
+    borderRadius: 8,
+  },
+  emptyStateButtonText: {
+    ...typography.button,
+    textAlign: 'center',
+  },
+  errorText: {
+    color: 'red',
+    marginBottom: spacing.small,
+    fontSize: 13,
+  },
 });
 
 export default ProvidersScreen;

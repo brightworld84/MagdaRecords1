@@ -17,7 +17,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import * as LocalAuthentication from 'expo-local-authentication';
 import { AuthContext } from '../services/auth';
-import { ThemeContext } from '../theme/themeContext'; // ✅ Fixed import path
+import { ThemeContext } from '../theme/themeContext';
 import { getUserSettings, updateUserSettings, changePassword } from '../services/storage';
 import { validatePassword } from '../utils/validation';
 import colors from '../theme/colors';
@@ -27,7 +27,14 @@ import spacing from '../theme/spacing';
 
 const SettingsScreen = ({ navigation }) => {
   const { state, updateUser } = useContext(AuthContext);
-  const { isDarkMode, toggleDarkMode } = useContext(ThemeContext);
+  const themeContext = useContext(ThemeContext);
+
+  if (!themeContext) {
+    console.warn('ThemeContext is unavailable — using light theme fallback');
+  }
+
+  const isDarkMode = themeContext?.isDarkMode ?? false;
+  const toggleDarkMode = themeContext?.toggleDarkMode ?? (() => {});
   const theme = isDarkMode ? darkColors : colors;
 
   const [isLoading, setIsLoading] = useState(true);
@@ -103,13 +110,18 @@ const SettingsScreen = ({ navigation }) => {
       }
 
       if (setting === 'darkMode') {
-        toggleDarkMode(); // call context function
+        toggleDarkMode();
       }
     } catch (error) {
       console.error(`Failed to update ${setting}:`, error);
       Alert.alert('Error', 'Failed to update setting');
       setSettings(prev => ({ ...prev, [setting]: !value }));
     }
+  };
+
+  const renderPasswordModal = () => {
+    // Placeholder logic: return null for now until implemented
+    return null;
   };
 
   return (
@@ -135,8 +147,7 @@ const SettingsScreen = ({ navigation }) => {
         </View>
       </ScrollView>
 
-      {/* This assumes renderPasswordModal() returns a modal with proper KeyboardAvoidingView */}
-      {renderPasswordModal && renderPasswordModal()}
+      {renderPasswordModal()}
     </SafeAreaView>
   );
 };

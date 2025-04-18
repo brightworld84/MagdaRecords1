@@ -21,7 +21,13 @@ import typography from '../theme/typography';
 
 const LandingScreen = ({ navigation }) => {
   const { login, tryLocalAuth } = useContext(AuthContext);
-  const { isDarkMode } = useContext(ThemeContext);
+  const themeContext = useContext(ThemeContext);
+
+  if (!themeContext) {
+    console.warn('ThemeContext is unavailable — using fallback light theme');
+  }
+
+  const isDarkMode = themeContext?.isDarkMode ?? false;
   const themedColors = isDarkMode ? darkColors : colors;
 
   const [isLoading, setIsLoading] = useState(false);

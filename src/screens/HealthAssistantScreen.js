@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthContext } from '../services/auth';
-import { ThemeContext } from '../theme/themeContext'; // ✅ Corrected path
+import { ThemeContext } from '../theme/themeContext';
 import { askHealthAssistant } from '../services/ai';
 import { getAllRecords } from '../services/storage';
 import AccountSelector from '../components/AccountSelector';
@@ -52,7 +52,13 @@ const Message = ({ message, isUser, theme }) => (
 
 const HealthAssistantScreen = () => {
   const { state } = useContext(AuthContext);
-  const { isDarkMode } = useContext(ThemeContext);
+  const themeContext = useContext(ThemeContext);
+
+  if (!themeContext) {
+    console.warn('ThemeContext is unavailable — using fallback light theme');
+  }
+
+  const isDarkMode = themeContext?.isDarkMode ?? false;
   const theme = isDarkMode ? darkColors : colors;
 
   const [selectedAccount, setSelectedAccount] = useState(null);
