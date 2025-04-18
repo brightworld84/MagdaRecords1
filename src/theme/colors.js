@@ -40,6 +40,11 @@ const colors = {
   divider: '#E2E8F0',
   inputBackground: '#FFFFFF',
   inputBorder: '#CBD5E0',
+
+  // 🔧 Required for full compatibility
+  buttonBackground: '#2B6CB0', // Match your primary color
+  buttonText: '#FFFFFF',
+  modalBackground: '#FFFFFF',
 };
 
 export default colors;

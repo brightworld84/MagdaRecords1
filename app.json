@@ -5,57 +5,29 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/icon.png",
+      "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#0B1D2C"
+      "backgroundColor": "#ffffff"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.magdarecords"
+    },
     "android": {
       "package": "com.anonymous.magdarecords",
       "versionCode": 1,
-      "permissions": [
-        "INTERNET",
-        "SYSTEM_ALERT_WINDOW",
-        "VIBRATE",
-        "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE"
-      ],
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#ffffff"
-      },
-      "intentFilters": [
-        {
-          "action": "VIEW",
-          "data": {
-            "scheme": "https"
-          },
-          "category": [
-            "BROWSABLE",
-            "DEFAULT"
-          ]
-        }
-      ]
-    },
-    "ios": {
-      "bundleIdentifier": "com.anonymous.magdarecords",
-      "supportsTablet": true,
-      "buildNumber": "1.0.0",
-      "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
       }
     },
-    "extra": {
-      "eas": {
-        "projectId": "e50b4424-d384-43ba-8a8d-7861af2eda01"
-      }
+    "web": {
+      "favicon": "./assets/favicon.png"
     }
   }
 }
