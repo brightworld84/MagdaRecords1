@@ -13,34 +13,26 @@ import darkColors from '../theme/darkColors';
 import typography from '../theme/typography';
 import spacing from '../theme/spacing';
 
-const MedicationInteraction = ({ interaction }) => {
+const MedicationInteraction = ({ interaction = {} }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const { isDarkMode } = useContext(ThemeContext);
   const theme = isDarkMode ? darkColors : colors;
 
-  const getSeverityColor = (severity) => {
+  const getSeverityColor = (severity = '') => {
     switch (severity.toLowerCase()) {
-      case 'high':
-        return theme.error;
-      case 'moderate':
-        return theme.warning;
-      case 'low':
-        return theme.success;
-      default:
-        return theme.text;
+      case 'high': return theme.error;
+      case 'moderate': return theme.warning;
+      case 'low': return theme.success;
+      default: return theme.text;
     }
   };
 
-  const getSeverityIcon = (severity) => {
+  const getSeverityIcon = (severity = '') => {
     switch (severity.toLowerCase()) {
-      case 'high':
-        return 'warning-outline';
-      case 'moderate':
-        return 'alert-circle-outline';
-      case 'low':
-        return 'information-circle-outline';
-      default:
-        return 'information-circle-outline';
+      case 'high': return 'warning-outline';
+      case 'moderate': return 'alert-circle-outline';
+      case 'low': return 'information-circle-outline';
+      default: return 'information-circle-outline';
     }
   };
 

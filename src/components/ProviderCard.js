@@ -13,15 +13,15 @@ import darkColors from '../theme/darkColors';
 import typography from '../theme/typography';
 import spacing from '../theme/spacing';
 
-const ProviderCard = ({ provider, onEdit, onDelete }) => {
+const ProviderCard = ({ provider = {}, onEdit = () => {}, onDelete = () => {} }) => {
   const { isDarkMode } = useContext(ThemeContext);
   const theme = isDarkMode ? darkColors : colors;
 
   const handleCall = () => {
     if (provider.phone) {
-      alert(`Calling ${provider.name} at ${provider.phone}`);
+      Alert.alert(`Calling ${provider.name}`, provider.phone);
     } else {
-      alert('No phone number available');
+      Alert.alert('No phone number available');
     }
   };
 
@@ -34,9 +34,7 @@ const ProviderCard = ({ provider, onEdit, onDelete }) => {
         {
           text: 'Delete',
           style: 'destructive',
-          onPress: () => {
-            if (onDelete) onDelete(provider.id);
-          },
+          onPress: () => onDelete(provider.id),
         },
       ],
       { cancelable: true }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import {
   Modal,
   View,
@@ -7,11 +7,16 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { ThemeContext } from '../../theme/themeContext';
 import colors from '../../theme/colors';
+import darkColors from '../../theme/darkColors';
 import typography from '../../theme/typography';
 import spacing from '../../theme/spacing';
 
 const ConfirmationDialog = ({ visible, title, message, onCancel, onConfirm }) => {
+  const { isDarkMode } = useContext(ThemeContext);
+  const theme = isDarkMode ? darkColors : colors;
+
   return (
     <Modal
       transparent
@@ -19,18 +24,28 @@ const ConfirmationDialog = ({ visible, title, message, onCancel, onConfirm }) =>
       visible={visible}
       onRequestClose={onCancel}
     >
-      <View style={styles.overlay}>
-        <View style={styles.container}>
-          <Ionicons name="alert-circle" size={32} color={colors.warning} style={styles.icon} />
-          <Text style={styles.title}>{title || 'Are you sure?'}</Text>
-          <Text style={styles.message}>{message || 'This action cannot be undone.'}</Text>
+      <View style={[styles.overlay, { backgroundColor: theme.overlay }]}>
+        <View style={[styles.container, { backgroundColor: theme.white }]}>
+          <Ionicons name="alert-circle" size={32} color={theme.warning} style={styles.icon} />
+          <Text style={[styles.title, { color: theme.text }]}>
+            {title || 'Are you sure?'}
+          </Text>
+          <Text style={[styles.message, { color: theme.secondaryText }]}>
+            {message || 'This action cannot be undone.'}
+          </Text>
           
           <View style={styles.buttonRow}>
-            <TouchableOpacity style={styles.cancelButton} onPress={onCancel}>
-              <Text style={styles.cancelText}>Cancel</Text>
+            <TouchableOpacity
+              style={[styles.cancelButton, { backgroundColor: theme.lightGray }]}
+              onPress={onCancel}
+            >
+              <Text style={[styles.cancelText, { color: theme.text }]}>Cancel</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.confirmButton} onPress={onConfirm}>
-              <Text style={styles.confirmText}>Yes, Delete</Text>
+            <TouchableOpacity
+              style={[styles.confirmButton, { backgroundColor: theme.error }]}
+              onPress={onConfirm}
+            >
+              <Text style={[styles.confirmText, { color: theme.white }]}>Yes, Delete</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -42,13 +57,11 @@ const ConfirmationDialog = ({ visible, title, message, onCancel, onConfirm }) =>
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: colors.overlay,
     justifyContent: 'center',
     alignItems: 'center',
     padding: spacing.large,
   },
   container: {
-    backgroundColor: colors.white,
     borderRadius: 12,
     padding: spacing.large,
     width: '100%',
@@ -62,13 +75,11 @@ const styles = StyleSheet.create({
   title: {
     ...typography.h3,
     textAlign: 'center',
-    color: colors.text,
     marginBottom: spacing.small,
   },
   message: {
     ...typography.body,
     textAlign: 'center',
-    color: colors.secondaryText,
     marginBottom: spacing.medium,
   },
   buttonRow: {
@@ -80,7 +91,6 @@ const styles = StyleSheet.create({
     flex: 1,
     marginRight: spacing.small,
     paddingVertical: spacing.medium,
-    backgroundColor: colors.lightGray,
     borderRadius: 8,
     alignItems: 'center',
   },
@@ -88,17 +98,14 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: spacing.small,
     paddingVertical: spacing.medium,
-    backgroundColor: colors.error,
     borderRadius: 8,
     alignItems: 'center',
   },
   cancelText: {
     ...typography.button,
-    color: colors.text,
   },
   confirmText: {
     ...typography.button,
-    color: colors.white,
   },
 });
 

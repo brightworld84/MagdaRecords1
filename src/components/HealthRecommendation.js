@@ -41,63 +41,57 @@ const HealthRecommendation = ({ recommendation }) => {
 
   const getCategoryLabel = (category) => {
     switch (category) {
-      case 'nutrition':
-        return 'Nutrition';
-      case 'exercise':
-        return 'Exercise';
-      case 'medication':
-        return 'Medication';
-      case 'checkup':
-        return 'Check-up';
-      case 'lifestyle':
-        return 'Lifestyle';
-      case 'mentalHealth':
-        return 'Mental Health';
-      default:
-        return 'General';
+      case 'nutrition': return 'Nutrition';
+      case 'exercise': return 'Exercise';
+      case 'medication': return 'Medication';
+      case 'checkup': return 'Check-up';
+      case 'lifestyle': return 'Lifestyle';
+      case 'mentalHealth': return 'Mental Health';
+      default: return 'General';
     }
   };
 
   const getPriorityColor = (priority) => {
     switch (priority) {
-      case 'high':
-        return theme.error;
-      case 'medium':
-        return theme.warning;
-      case 'low':
-        return theme.success;
-      default:
-        return theme.text;
+      case 'high': return theme.error;
+      case 'medium': return theme.warning;
+      case 'low': return theme.success;
+      default: return theme.text;
     }
   };
 
   return (
-    <TouchableOpacity style={[styles.container, { backgroundColor: theme.white, shadowColor: theme.black }]} onPress={() => setModalVisible(true)}>
-      <View style={styles.iconContainer}>{getCategoryIcon(recommendation.category)}</View>
+    <TouchableOpacity
+      style={[styles.container, { backgroundColor: theme.white, shadowColor: theme.black }]}
+      onPress={() => setModalVisible(true)}
+    >
+      <View style={styles.iconContainer}>
+        {getCategoryIcon(recommendation?.category)}
+      </View>
 
       <View style={styles.contentContainer}>
-        <Text style={[styles.title, { color: theme.text }]}>{recommendation.title}</Text>
+        <Text style={[styles.title, { color: theme.text }]}>{recommendation?.title}</Text>
         <Text style={[styles.summary, { color: theme.secondaryText }]} numberOfLines={2}>
-          {recommendation.summary}
+          {recommendation?.summary}
         </Text>
 
         <View style={styles.footer}>
-          <View style={[styles.priorityBadge, { backgroundColor: getPriorityColor(recommendation.priority) }]}>
+          <View style={[styles.priorityBadge, { backgroundColor: getPriorityColor(recommendation?.priority) }]}>
             <Text style={styles.priorityText}>
-              {recommendation.priority === 'high' ? 'High Priority' :
-               recommendation.priority === 'medium' ? 'Medium Priority' : 'Low Priority'}
+              {recommendation?.priority === 'high' ? 'High Priority' :
+                recommendation?.priority === 'medium' ? 'Medium Priority' :
+                'Low Priority'}
             </Text>
           </View>
-
           <Text style={[styles.sourceText, { color: theme.secondaryText }]}>
-            Based on your {recommendation.basedOn}
+            Based on your {recommendation?.basedOn}
           </Text>
         </View>
       </View>
 
       <Modal
         visible={modalVisible}
-        transparent={true}
+        transparent
         animationType="slide"
         onRequestClose={() => setModalVisible(false)}
       >
@@ -112,42 +106,40 @@ const HealthRecommendation = ({ recommendation }) => {
 
             <ScrollView style={styles.modalContent}>
               <View style={styles.modalCategoryContainer}>
-                {getCategoryIcon(recommendation.category)}
+                {getCategoryIcon(recommendation?.category)}
                 <Text style={[styles.modalCategoryText, { color: theme.primary }]}>
-                  {getCategoryLabel(recommendation.category)}
+                  {getCategoryLabel(recommendation?.category)}
                 </Text>
               </View>
 
               <Text style={[styles.modalRecommendationTitle, { color: theme.text }]}>
-                {recommendation.title}
+                {recommendation?.title}
               </Text>
 
               <View
                 style={[
                   styles.modalPriorityContainer,
-                  { backgroundColor: getPriorityColor(recommendation.priority) + '20' },
+                  { backgroundColor: getPriorityColor(recommendation?.priority) + '20' },
                 ]}
               >
                 <Ionicons
                   name={
-                    recommendation.priority === 'high'
+                    recommendation?.priority === 'high'
                       ? 'alert-circle'
-                      : recommendation.priority === 'medium'
+                      : recommendation?.priority === 'medium'
                       ? 'information-circle'
                       : 'checkmark-circle'
                   }
                   size={22}
-                  color={getPriorityColor(recommendation.priority)}
+                  color={getPriorityColor(recommendation?.priority)}
                 />
-                <Text
-                  style={[
-                    styles.modalPriorityText,
-                    { color: getPriorityColor(recommendation.priority) },
-                  ]}
-                >
-                  {recommendation.priority === 'high'
+                <Text style={[
+                  styles.modalPriorityText,
+                  { color: getPriorityColor(recommendation?.priority) },
+                ]}>
+                  {recommendation?.priority === 'high'
                     ? 'High Priority'
-                    : recommendation.priority === 'medium'
+                    : recommendation?.priority === 'medium'
                     ? 'Medium Priority'
                     : 'Low Priority'}
                 </Text>
@@ -156,22 +148,20 @@ const HealthRecommendation = ({ recommendation }) => {
               <View style={styles.modalSection}>
                 <Text style={[styles.modalSectionTitle, { color: theme.text }]}>Summary</Text>
                 <Text style={[styles.modalSectionText, { color: theme.text }]}>
-                  {recommendation.summary}
+                  {recommendation?.summary}
                 </Text>
               </View>
 
               <View style={styles.modalSection}>
                 <Text style={[styles.modalSectionTitle, { color: theme.text }]}>Details</Text>
                 <Text style={[styles.modalSectionText, { color: theme.text }]}>
-                  {recommendation.details}
+                  {recommendation?.details}
                 </Text>
               </View>
 
-              {recommendation.steps && (
+              {recommendation?.steps?.length > 0 && (
                 <View style={styles.modalSection}>
-                  <Text style={[styles.modalSectionTitle, { color: theme.text }]}>
-                    Suggested Steps
-                  </Text>
+                  <Text style={[styles.modalSectionTitle, { color: theme.text }]}>Suggested Steps</Text>
                   {recommendation.steps.map((step, index) => (
                     <View key={index} style={styles.stepContainer}>
                       <View style={[styles.stepNumberContainer, { backgroundColor: theme.primary }]}>
@@ -185,17 +175,13 @@ const HealthRecommendation = ({ recommendation }) => {
                 </View>
               )}
 
-              <View
-                style={[
-                  styles.modalSourceContainer,
-                  { backgroundColor: theme.lightBackground },
-                ]}
-              >
-                <Text style={[styles.modalSourceTitle, { color: theme.text }]}>
-                  Based On
-                </Text>
+              <View style={[
+                styles.modalSourceContainer,
+                { backgroundColor: theme.lightBackground }
+              ]}>
+                <Text style={[styles.modalSourceTitle, { color: theme.text }]}>Based On</Text>
                 <Text style={[styles.modalSourceText, { color: theme.secondaryText }]}>
-                  This recommendation is based on your {recommendation.basedOn.toLowerCase()}.
+                  This recommendation is based on your {recommendation?.basedOn?.toLowerCase()}.
                 </Text>
               </View>
 

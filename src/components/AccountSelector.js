@@ -16,13 +16,20 @@ import { ThemeContext } from '../theme/themeContext';
 
 const AccountSelector = ({ accounts, selectedAccount, onSelectAccount }) => {
   const [modalVisible, setModalVisible] = useState(false);
-  const { isDarkMode } = useContext(ThemeContext);
+  const themeContext = useContext(ThemeContext);
+
+  if (!themeContext) {
+    console.warn('ThemeContext is unavailable — defaulting to light mode');
+  }
+
+  const isDarkMode = themeContext?.isDarkMode ?? false;
   const theme = isDarkMode ? darkColors : colors;
+  const cardColor = theme.cardBg || theme.background;
 
   const currentAccount = accounts.find(acc => acc.id === selectedAccount) || accounts[0];
-  
-  const getInitials = (firstName, lastName) => {
-    return `${firstName ? firstName.charAt(0) : ''}${lastName ? lastName.charAt(0) : ''}`;
+
+  const getInitials = (firstName = '', lastName = '') => {
+    return `${firstName.charAt(0)}${lastName?.charAt(0) || ''}`.toUpperCase();
   };
 
   const toggleModal = () => setModalVisible(!modalVisible);
@@ -36,16 +43,18 @@ const AccountSelector = ({ accounts, selectedAccount, onSelectAccount }) => {
     return null;
   }
 
+  const [firstName, lastName = ''] = currentAccount.name?.split(' ') || ['U', ''];
+
   return (
-    <View style={[styles.container, { backgroundColor: theme.card, borderBottomColor: theme.lightGray }]}>
+    <View style={[styles.container, { backgroundColor: cardColor, borderBottomColor: theme.lightGray }]}>
       <TouchableOpacity style={styles.selector} onPress={toggleModal}>
         <View style={styles.selectedAccount}>
           <View style={[styles.avatarContainer, { backgroundColor: theme.primary }]}>
             <Text style={[styles.avatarText, { color: theme.white }]}>
-              {currentAccount ? getInitials(currentAccount.name.split(' ')[0], currentAccount.name.split(' ')[1]) : ''}
+              {getInitials(firstName, lastName)}
             </Text>
           </View>
-          <Text style={[styles.accountName, { color: theme.text }]}>{currentAccount ? currentAccount.name : ''}</Text>
+          <Text style={[styles.accountName, { color: theme.text }]}>{currentAccount.name}</Text>
         </View>
         <Ionicons name="chevron-down" size={20} color={theme.text} />
       </TouchableOpacity>
@@ -61,7 +70,7 @@ const AccountSelector = ({ accounts, selectedAccount, onSelectAccount }) => {
           activeOpacity={1} 
           onPress={toggleModal}
         >
-          <View style={[styles.modalContainer, { backgroundColor: theme.card, shadowColor: theme.black }]}>
+          <View style={[styles.modalContainer, { backgroundColor: cardColor, shadowColor: theme.black }]}>
             <View style={[styles.modalHeader, { borderBottomColor: theme.lightGray }]}>
               <Text style={[styles.modalTitle, { color: theme.text }]}>Select Account</Text>
               <TouchableOpacity onPress={toggleModal}>
@@ -70,47 +79,49 @@ const AccountSelector = ({ accounts, selectedAccount, onSelectAccount }) => {
             </View>
 
             <ScrollView style={styles.accountsList}>
-              {accounts.map((account) => (
-                <TouchableOpacity
-                  key={account.id}
-                  style={[
-                    styles.accountItem,
-                    selectedAccount === account.id && { backgroundColor: theme.primaryLight }
-                  ]}
-                  onPress={() => handleSelectAccount(account.id)}
-                >
-                  <View style={styles.accountItemContent}>
-                    <View style={[
-                      styles.accountAvatar,
-                      { backgroundColor: selectedAccount === account.id ? theme.primary : theme.lightGray }
-                    ]}>
-                      <Text style={[
-                        styles.accountAvatarText,
-                        { color: selectedAccount === account.id ? theme.white : theme.text }
+              {accounts.map((account) => {
+                const [first, last = ''] = account.name?.split(' ') || ['U', ''];
+                return (
+                  <TouchableOpacity
+                    key={account.id}
+                    style={[
+                      styles.accountItem,
+                      selectedAccount === account.id && { backgroundColor: theme.primaryLight }
+                    ]}
+                    onPress={() => handleSelectAccount(account.id)}
+                  >
+                    <View style={styles.accountItemContent}>
+                      <View style={[
+                        styles.accountAvatar,
+                        { backgroundColor: selectedAccount === account.id ? theme.primary : theme.lightGray }
                       ]}>
-                        {getInitials(account.name.split(' ')[0], account.name.split(' ')[1])}
-                      </Text>
-                    </View>
-                    <View style={styles.accountDetails}>
-                      <Text style={[
-                        styles.accountItemName,
-                        { color: selectedAccount === account.id ? theme.primary : theme.text }
-                      ]}>
-                        {account.name}
-                      </Text>
-                      {account.relationship && (
-                        <Text style={[styles.accountRelationship, { color: theme.secondaryText }]}>
-                          {account.relationship}
+                        <Text style={[
+                          styles.accountAvatarText,
+                          { color: selectedAccount === account.id ? theme.white : theme.text }
+                        ]}>
+                          {getInitials(first, last)}
                         </Text>
-                      )}
+                      </View>
+                      <View style={styles.accountDetails}>
+                        <Text style={[
+                          styles.accountItemName,
+                          { color: selectedAccount === account.id ? theme.primary : theme.text }
+                        ]}>
+                          {account.name}
+                        </Text>
+                        {account.relationship && (
+                          <Text style={[styles.accountRelationship, { color: theme.secondaryText }]}>
+                            {account.relationship}
+                          </Text>
+                        )}
+                      </View>
                     </View>
-                  </View>
-
-                  {selectedAccount === account.id && (
-                    <Ionicons name="checkmark" size={24} color={theme.primary} />
-                  )}
-                </TouchableOpacity>
-              ))}
+                    {selectedAccount === account.id && (
+                      <Ionicons name="checkmark" size={24} color={theme.primary} />
+                    )}
+                  </TouchableOpacity>
+                );
+              })}
             </ScrollView>
           </View>
         </TouchableOpacity>

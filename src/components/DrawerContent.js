@@ -21,7 +21,13 @@ import spacing from '../theme/spacing';
 
 const DrawerContent = (props) => {
   const { state, logout } = useContext(AuthContext);
-  const { isDarkMode } = useContext(ThemeContext);
+  const themeContext = useContext(ThemeContext);
+
+  if (!themeContext) {
+    console.warn('ThemeContext unavailable — defaulting to light mode.');
+  }
+
+  const isDarkMode = themeContext?.isDarkMode ?? false;
   const theme = isDarkMode ? darkColors : colors;
 
   const [linkedAccounts, setLinkedAccounts] = useState([]);
@@ -42,27 +48,34 @@ const DrawerContent = (props) => {
     }
   };
 
-  const getInitials = (firstName, lastName) => {
-    return `${firstName ? firstName.charAt(0) : ''}${lastName ? lastName.charAt(0) : ''}`;
+  const getInitials = (first = '', last = '') => {
+    return `${first.charAt(0)}${last.charAt(0)}`.toUpperCase();
   };
 
+  const userFirstName = state.user?.firstName || 'U';
+  const userLastName = state.user?.lastName || '';
+  const userEmail = state.user?.email || '';
+
   return (
-    <DrawerContentScrollView {...props} contentContainerStyle={[styles.container, { backgroundColor: theme.background }]}>
+    <DrawerContentScrollView
+      {...props}
+      contentContainerStyle={[styles.container, { backgroundColor: theme.background }]}
+    >
       <View style={[styles.header, { backgroundColor: theme.primaryLight }]}>
         <View style={styles.userInfoSection}>
           <View style={styles.avatarContainer}>
             <View style={[styles.avatar, { backgroundColor: theme.primary }]}>
               <Text style={[styles.avatarText, { color: theme.white }]}>
-                {getInitials(state.user?.firstName, state.user?.lastName)}
+                {getInitials(userFirstName, userLastName)}
               </Text>
             </View>
           </View>
           <View style={styles.userDetails}>
             <Text style={[styles.userName, { color: theme.text }]}>
-              {state.user?.firstName} {state.user?.lastName}
+              {userFirstName} {userLastName}
             </Text>
             <Text style={[styles.userEmail, { color: theme.secondaryText }]}>
-              {state.user?.email}
+              {userEmail}
             </Text>
           </View>
         </View>
@@ -73,7 +86,9 @@ const DrawerContent = (props) => {
               style={styles.linkedAccountsHeader}
               onPress={() => setShowLinkedAccounts(!showLinkedAccounts)}
             >
-              <Text style={[styles.linkedAccountsTitle, { color: theme.text }]}>Family Accounts</Text>
+              <Text style={[styles.linkedAccountsTitle, { color: theme.text }]}>
+                Family Accounts
+              </Text>
               <Ionicons
                 name={showLinkedAccounts ? 'chevron-up' : 'chevron-down'}
                 size={20}
@@ -87,7 +102,7 @@ const DrawerContent = (props) => {
                   <TouchableOpacity key={account.id} style={styles.linkedAccountItem}>
                     <View style={[styles.linkedAccountAvatar, { backgroundColor: theme.accent }]}>
                       <Text style={[styles.linkedAccountAvatarText, { color: theme.white }]}>
-                        {getInitials(account.firstName, account.lastName)}
+                        {getInitials(account.firstName || '', account.lastName || '')}
                       </Text>
                     </View>
                     <Text style={[styles.linkedAccountName, { color: theme.text }]}>
@@ -106,7 +121,7 @@ const DrawerContent = (props) => {
       </View>
 
       <View style={[styles.footer, { borderTopColor: theme.lightGray }]}>
-        <TouchableOpacity style={styles.logoutButton} onPress={() => logout()}>
+        <TouchableOpacity style={styles.logoutButton} onPress={logout}>
           <Ionicons name="log-out-outline" size={24} color={theme.error} />
           <Text style={[styles.logoutButtonText, { color: theme.error }]}>Logout</Text>
         </TouchableOpacity>

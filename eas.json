@@ -17,7 +17,8 @@
     "production": {
       "autoIncrement": true,
       "developmentClient": false,
-      "distribution": "store"
+      "distribution": "store",
+      "submit": {}
     }
   },
   "submit": {

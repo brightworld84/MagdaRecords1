@@ -119,7 +119,6 @@ const RecordFilter = ({ options, onApplyFilters, onCancel, allRecords = [] }) =>
       </View>
 
       <ScrollView style={styles.content}>
-        {/* Record Type */}
         <View style={styles.filterSection}>
           <Text style={[styles.sectionTitle, { color: themedColors.text }]}>Record Type</Text>
           <View style={styles.optionsContainer}>
@@ -143,7 +142,6 @@ const RecordFilter = ({ options, onApplyFilters, onCancel, allRecords = [] }) =>
           </View>
         </View>
 
-        {/* Date Range */}
         <View style={styles.filterSection}>
           <Text style={[styles.sectionTitle, { color: themedColors.text }]}>Date Range</Text>
           <View style={styles.optionsContainer}>
@@ -167,7 +165,6 @@ const RecordFilter = ({ options, onApplyFilters, onCancel, allRecords = [] }) =>
           </View>
         </View>
 
-        {/* Provider */}
         <View style={styles.filterSection}>
           <Text style={[styles.sectionTitle, { color: themedColors.text }]}>Provider</Text>
           <View style={styles.optionsContainer}>
@@ -191,7 +188,6 @@ const RecordFilter = ({ options, onApplyFilters, onCancel, allRecords = [] }) =>
           </View>
         </View>
 
-        {/* Keyword Filter */}
         <View style={styles.filterSection}>
           <Text style={[styles.sectionTitle, { color: themedColors.text }]}>Keywords</Text>
           <View style={styles.keywordInputContainer}>

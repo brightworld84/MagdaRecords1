@@ -160,10 +160,35 @@ const RecordCard = ({ record, onDelete }) => {
         </View>
       )}
 
-      {/* Add more modal or buttons here as needed */}
       <TouchableOpacity onPress={confirmDelete} style={{ marginTop: spacing.medium }}>
         <Text style={{ color: themedColors.error, fontWeight: 'bold' }}>Delete</Text>
       </TouchableOpacity>
+
+      <Modal
+        visible={modalVisible}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' }}>
+          <View style={{ backgroundColor: themedColors.white, borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: spacing.medium, maxHeight: '80%' }}>
+            <ScrollView>
+              <Text style={[typography.h2, { color: themedColors.text, marginBottom: spacing.medium }]}>
+                {record.title}
+              </Text>
+              <Text style={[typography.body, { color: themedColors.text }]}>
+                {record.description || 'No additional details available.'}
+              </Text>
+            </ScrollView>
+            <TouchableOpacity
+              style={{ marginTop: spacing.medium, alignSelf: 'flex-end' }}
+              onPress={() => setModalVisible(false)}
+            >
+              <Text style={{ color: themedColors.primary, fontWeight: 'bold' }}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </TouchableOpacity>
   );
 };
