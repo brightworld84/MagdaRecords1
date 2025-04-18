@@ -21,7 +21,7 @@ import {
   removeLinkedAccount,
   updateUserDetails,
 } from '../services/storage';
-import { ThemeContext } from '../contexts/ThemeContext';
+import { ThemeContext } from '../theme/themeContext'; // ✅ Fixed import path
 import colors from '../theme/colors';
 import darkColors from '../theme/darkColors';
 import typography from '../theme/typography';

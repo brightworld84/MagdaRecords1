@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthContext } from '../services/auth';
-import { ThemeContext } from '../contexts/ThemeContext';
+import { ThemeContext } from '../theme/themeContext'; // ✅ Corrected path
 import { askHealthAssistant } from '../services/ai';
 import { getAllRecords } from '../services/storage';
 import AccountSelector from '../components/AccountSelector';

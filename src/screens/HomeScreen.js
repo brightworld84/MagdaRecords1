@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthContext } from '../services/auth';
-import { ThemeContext } from '../contexts/ThemeContext';
+import { ThemeContext } from '../theme/themeContext'; // ✅ Updated import path
 import { getRecentRecords } from '../services/storage';
 import { analyzeMedicationInteractions, getHealthRecommendations } from '../services/ai';
 import RecordCard from '../components/RecordCard';

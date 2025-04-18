@@ -17,7 +17,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import * as LocalAuthentication from 'expo-local-authentication';
 import { AuthContext } from '../services/auth';
-import { ThemeContext } from '../theme/themeContext';
+import { ThemeContext } from '../theme/themeContext'; // ✅ Fixed import path
 import { getUserSettings, updateUserSettings, changePassword } from '../services/storage';
 import { validatePassword } from '../utils/validation';
 import colors from '../theme/colors';
