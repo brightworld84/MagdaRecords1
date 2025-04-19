@@ -20,7 +20,7 @@ import darkColors from '../theme/darkColors';
 import typography from '../theme/typography';
 
 const LandingScreen = ({ navigation }) => {
-  console.log('📍 LandingScreen mounted');
+  console.log('📍 LandingScreen mounted'); // ✅ Mount log
 
   const { login, tryLocalAuth } = useContext(AuthContext);
   const themeContext = useContext(ThemeContext);
@@ -88,6 +88,8 @@ const LandingScreen = ({ navigation }) => {
       </View>
     );
   }
+
+  console.log('✅ LandingScreen: rendering UI'); // ✅ Render log
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: themedColors.background }]}>
