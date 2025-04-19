@@ -4,9 +4,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { Platform } from 'react-native';
+import { Platform, View, ActivityIndicator, Text } from 'react-native';
 
-// Screens
 import LandingScreen from '../screens/LandingScreen';
 import SignUpScreen from '../screens/SignUpScreen';
 import HomeScreen from '../screens/HomeScreen';
@@ -16,15 +15,14 @@ import HealthAssistantScreen from '../screens/HealthAssistantScreen';
 import ProvidersScreen from '../screens/ProvidersScreen';
 import AccountScreen from '../screens/AccountScreen';
 import SettingsScreen from '../screens/SettingsScreen';
-
-// Components
 import DrawerContent from '../components/DrawerContent';
 
-// Contexts and Theme
 import { AuthContext } from '../services/auth';
 import { ThemeContext } from '../theme/themeContext';
 import colors from '../theme/colors';
 import darkColors from '../theme/darkColors';
+import typography from '../theme/typography';
+import spacing from '../theme/spacing';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -51,7 +49,7 @@ const MainTabs = ({ theme }) => (
         borderTopColor: theme.lightGray,
         paddingTop: 5,
         height: 70,
-        elevation: 8, // Android shadow
+        elevation: 8,
         shadowColor: theme.shadow,
         shadowOffset: { width: 0, height: -2 },
         shadowOpacity: 0.2,
@@ -150,6 +148,17 @@ const AppNavigator = () => {
   const { state } = useContext(AuthContext);
   const { isDarkMode } = useContext(ThemeContext);
   const theme = isDarkMode ? darkColors : colors;
+
+  if (state.isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: theme.background }}>
+        <ActivityIndicator size="large" color={theme.primary} />
+        <Text style={[typography.body, { marginTop: spacing.medium, color: theme.text }]}>
+          Loading...
+        </Text>
+      </View>
+    );
+  }
 
   return (
     <NavigationContainer>

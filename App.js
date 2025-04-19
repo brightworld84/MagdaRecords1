@@ -10,27 +10,12 @@ import {
   ActivityIndicator,
   LogBox,
 } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
-import { ThemeProvider, useTheme } from './src/theme/themeContext';
+import { ThemeProvider } from './src/theme/themeContext';
 
 LogBox.ignoreLogs([
   'Warning: ...',
   'Possible Unhandled Promise Rejection',
 ]);
-
-console.log('App is initializing...');
-
-// Separate component to safely use ThemeContext
-function InnerAppContent() {
-  const { theme, isDark } = useTheme();
-
-  return (
-    <NavigationContainer>
-      <StatusBar style={isDark ? 'light' : 'dark'} />
-      <AppNavigator />
-    </NavigationContainer>
-  );
-}
 
 function AppContent() {
   const [isReady, setIsReady] = useState(false);
@@ -73,7 +58,7 @@ function AppContent() {
     );
   }
 
-  return <InnerAppContent />;
+  return <AppNavigator />;
 }
 
 export default function App() {
@@ -81,6 +66,7 @@ export default function App() {
     <SafeAreaProvider>
       <ThemeProvider>
         <AuthProvider>
+          <StatusBar style="auto" />
           <AppContent />
         </AuthProvider>
       </ThemeProvider>
