@@ -20,6 +20,8 @@ import darkColors from '../theme/darkColors';
 import typography from '../theme/typography';
 
 const LandingScreen = ({ navigation }) => {
+  console.log('📍 LandingScreen mounted');
+
   const { login, tryLocalAuth } = useContext(AuthContext);
   const themeContext = useContext(ThemeContext);
 
