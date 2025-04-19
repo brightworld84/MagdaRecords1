@@ -148,6 +148,8 @@ const AppNavigator = () => {
   const { state } = useContext(AuthContext);
   const { isDarkMode } = useContext(ThemeContext);
   const theme = isDarkMode ? darkColors : colors;
+  console.log('🔍 Auth state in AppNavigator:', state);
+
 
   // ⚠️ TEMP: Disable auth check to test white screen issue
   return (
