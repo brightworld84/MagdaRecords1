@@ -149,20 +149,10 @@ const AppNavigator = () => {
   const { isDarkMode } = useContext(ThemeContext);
   const theme = isDarkMode ? darkColors : colors;
 
-  if (state.isLoading) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: theme.background }}>
-        <ActivityIndicator size="large" color={theme.primary} />
-        <Text style={[typography.body, { marginTop: spacing.medium, color: theme.text }]}>
-          Loading...
-        </Text>
-      </View>
-    );
-  }
-
+  // ⚠️ TEMP: Disable auth check to test white screen issue
   return (
     <NavigationContainer>
-      {state.isAuthenticated ? <MainDrawer theme={theme} /> : <AuthStack />}
+      <MainDrawer theme={theme} />
     </NavigationContainer>
   );
 };
