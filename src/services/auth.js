@@ -64,15 +64,24 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
+        console.log('🔑 AuthProvider: checking for existing user...');
         dispatch({ type: 'SET_LOADING', payload: true });
+
         const userJson = await SecureStore.getItemAsync(AUTH_KEYS.USER_DATA);
         if (userJson) {
+          console.log('🧩 Encrypted user JSON:', userJson);
           const decryptedUserJson = await decryptData(userJson);
+          console.log('🧩 Decrypted user JSON:', decryptedUserJson);
+
           const userData = JSON.parse(decryptedUserJson);
+          console.log('✅ Dispatching login for:', userData);
+
           dispatch({ type: 'LOGIN', payload: userData });
+        } else {
+          console.log('ℹ️ No stored user found.');
         }
       } catch (error) {
-        console.error('Auth check error:', error);
+        console.error('❌ AuthProvider error in checkAuth:', error);
       } finally {
         dispatch({ type: 'SET_LOADING', payload: false });
       }
@@ -91,10 +100,13 @@ export const AuthProvider = ({ children }) => {
       };
       const encryptedUserData = await encryptData(JSON.stringify(newUser));
       await SecureStore.setItemAsync(AUTH_KEYS.USER_DATA, encryptedUserData);
-      dispatch({ type: 'LOGIN', payload: newUser }); // ✅ Add this line
+
+      console.log('🆕 User registered and stored:', newUser);
+
+      dispatch({ type: 'LOGIN', payload: newUser }); // Auto-login after registration
       return newUser;
     } catch (error) {
-      console.error('Registration error:', error);
+      console.error('❌ Registration error:', error);
       dispatch({
         type: 'AUTH_ERROR',
         payload: error.message || 'Failed to register. Please try again.',
@@ -115,12 +127,16 @@ export const AuthProvider = ({ children }) => {
         createdAt: new Date().toISOString(),
         biometricEnabled: false,
       };
+
       const encryptedUserData = await encryptData(JSON.stringify(testUser));
       await SecureStore.setItemAsync(AUTH_KEYS.USER_DATA, encryptedUserData);
+
+      console.log('🔐 Login successful. Stored user:', testUser);
+
       dispatch({ type: 'LOGIN', payload: testUser });
       return testUser;
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('❌ Login error:', error);
       dispatch({
         type: 'AUTH_ERROR',
         payload: error.message || 'Failed to login. Please check your credentials.',
@@ -135,10 +151,14 @@ export const AuthProvider = ({ children }) => {
       if (!userJson) throw new Error('No stored user found');
       const decryptedUserJson = await decryptData(userJson);
       const userData = JSON.parse(decryptedUserJson);
+
       if (!userData.biometricEnabled) throw new Error('Biometric authentication not enabled');
+
+      console.log('✅ Biometric authentication succeeded. Logging in user:', userData);
+
       dispatch({ type: 'LOGIN', payload: userData });
     } catch (error) {
-      console.error('Biometric auth error:', error);
+      console.error('❌ Biometric auth error:', error);
       dispatch({
         type: 'AUTH_ERROR',
         payload: error.message || 'Biometric authentication failed.',
@@ -151,9 +171,12 @@ export const AuthProvider = ({ children }) => {
     try {
       const encryptedUserData = await encryptData(JSON.stringify(userData));
       await SecureStore.setItemAsync(AUTH_KEYS.USER_DATA, encryptedUserData);
+
+      console.log('📝 Updated user data stored:', userData);
+
       dispatch({ type: 'UPDATE_USER', payload: userData });
     } catch (error) {
-      console.error('Update user error:', error);
+      console.error('❌ Update user error:', error);
       dispatch({
         type: 'AUTH_ERROR',
         payload: error.message || 'Failed to update user information.',
@@ -165,9 +188,10 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       await SecureStore.deleteItemAsync(AUTH_KEYS.USER_DATA);
+      console.log('👋 User logged out. Data cleared.');
       dispatch({ type: 'LOGOUT' });
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error('❌ Logout error:', error);
     }
   };
 
@@ -187,7 +211,6 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// Get OpenAI API Key (used by AI features)
 export const getApiKey = async () => {
   try {
     const encryptedKey = await SecureStore.getItemAsync(AUTH_KEYS.OPENAI_API_KEY);
@@ -195,7 +218,7 @@ export const getApiKey = async () => {
     const decryptedKey = await decryptData(encryptedKey);
     return decryptedKey;
   } catch (error) {
-    console.error('Failed to retrieve API key:', error);
+    console.error('❌ Failed to retrieve API key:', error);
     return null;
   }
 };
