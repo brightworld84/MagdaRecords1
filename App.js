@@ -17,16 +17,20 @@ LogBox.ignoreLogs([
   'Possible Unhandled Promise Rejection',
 ]);
 
+console.log('✅ App.js: App component is mounting...');
+
 function AppContent() {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
     const prepare = async () => {
       try {
+        console.log('⏳ AppContent: preparing app...');
         await new Promise(resolve => setTimeout(resolve, 500));
       } catch (e) {
-        console.warn('Failed to initialize app:', e);
+        console.warn('⚠️ Failed to initialize app:', e);
       } finally {
+        console.log('✅ AppContent: ready to load navigator');
         setIsReady(true);
       }
     };
@@ -62,6 +66,8 @@ function AppContent() {
 }
 
 export default function App() {
+  console.log('✅ App.js: Rendering App with Providers');
+
   return (
     <SafeAreaProvider>
       <ThemeProvider>
