@@ -48,6 +48,7 @@ const MainTabs = ({ theme }) => (
         backgroundColor: theme.cardBg,
         borderTopColor: theme.lightGray,
         paddingTop: 5,
+        paddingBottom: Platform.OS === 'ios' ? spacing.medium : 10, // ✅ PRESERVED YOUR PADDING
         height: 70,
         elevation: 8,
         shadowColor: theme.shadow,
@@ -58,8 +59,8 @@ const MainTabs = ({ theme }) => (
       headerShown: false,
     }}
   >
-    <Tab.Screen 
-      name="Home" 
+    <Tab.Screen
+      name="Home"
       component={HomeScreen}
       options={{
         tabBarIcon: ({ color, size }) => (
@@ -67,36 +68,36 @@ const MainTabs = ({ theme }) => (
         ),
       }}
     />
-    <Tab.Screen 
-      name="Records" 
-      component={RecordsScreen} 
+    <Tab.Screen
+      name="Records"
+      component={RecordsScreen}
       options={{
         tabBarIcon: ({ color, size }) => (
           <MaterialCommunityIcons name="file-document-outline" size={size} color={color} />
         ),
       }}
     />
-    <Tab.Screen 
-      name="Upload" 
-      component={UploadScreen} 
+    <Tab.Screen
+      name="Upload"
+      component={UploadScreen}
       options={{
         tabBarIcon: ({ color, size }) => (
           <Ionicons name="cloud-upload-outline" size={size} color={color} />
         ),
       }}
     />
-    <Tab.Screen 
-      name="Health Assistant" 
-      component={HealthAssistantScreen} 
+    <Tab.Screen
+      name="Health Assistant"
+      component={HealthAssistantScreen}
       options={{
         tabBarIcon: ({ color, size }) => (
           <MaterialCommunityIcons name="robot-outline" size={size} color={color} />
         ),
       }}
     />
-    <Tab.Screen 
-      name="Providers" 
-      component={ProvidersScreen} 
+    <Tab.Screen
+      name="Providers"
+      component={ProvidersScreen}
       options={{
         tabBarIcon: ({ color, size }) => (
           <Ionicons name="people-outline" size={size} color={color} />
@@ -130,9 +131,9 @@ const MainDrawer = ({ theme }) => (
       },
     }}
   >
-    <Drawer.Screen 
-      name="MainTabs" 
-      options={{ 
+    <Drawer.Screen
+      name="MainTabs"
+      options={{
         title: 'MagdaRecords',
         headerTitleAlign: 'center',
       }}
@@ -148,13 +149,30 @@ const AppNavigator = () => {
   const { state } = useContext(AuthContext);
   const { isDarkMode } = useContext(ThemeContext);
   const theme = isDarkMode ? darkColors : colors;
-  console.log('🔍 Auth state in AppNavigator:', state);
 
+  console.log('🧭 AppNavigator auth state:', state);
 
-  // ⚠️ TEMP: Disable auth check to test white screen issue
+  if (state.isLoading) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: theme.background,
+        }}
+      >
+        <ActivityIndicator size="large" color={theme.primary} />
+        <Text style={[typography.body, { marginTop: spacing.medium, color: theme.text }]}>
+          Loading...
+        </Text>
+      </View>
+    );
+  }
+
   return (
     <NavigationContainer>
-      <MainDrawer theme={theme} />
+      {state.isAuthenticated ? <MainDrawer theme={theme} /> : <AuthStack />}
     </NavigationContainer>
   );
 };
