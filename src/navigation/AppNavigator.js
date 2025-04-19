@@ -145,6 +145,13 @@ const MainDrawer = ({ theme }) => (
   </Drawer.Navigator>
 );
 
+// TEMP DEBUG SCREEN FOR WHITE SCREEN TEST
+const DebugScreen = () => (
+  <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'white' }}>
+    <Text style={{ fontSize: 20, color: 'red' }}>✅ DebugScreen is visible</Text>
+  </View>
+);
+
 const AppNavigator = () => {
   const { state } = useContext(AuthContext);
   const { isDarkMode } = useContext(ThemeContext);
@@ -170,11 +177,19 @@ const AppNavigator = () => {
     );
   }
 
+  // ✅ TEMP OVERRIDE FOR WHITE SCREEN DEBUGGING
   return (
     <NavigationContainer>
-      {state.isAuthenticated ? <MainDrawer theme={theme} /> : <AuthStack />}
+      <DebugScreen />
     </NavigationContainer>
   );
+
+  // Once the debug screen works, restore this:
+  // return (
+  //   <NavigationContainer>
+  //     {state.isAuthenticated ? <MainDrawer theme={theme} /> : <AuthStack />}
+  //   </NavigationContainer>
+  // );
 };
 
 export default AppNavigator;
