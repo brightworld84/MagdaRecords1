@@ -77,74 +77,81 @@ const RecordsScreen = () => {
     if (!selectedAccount) return;
     setIsLoading(true);
     try {
-      const allRecords = await getAllRecords(selectedAccount);
+      const allRecords = (await getAllRecords(selectedAccount)) || [];
       setRecords(allRecords);
     } catch (error) {
       console.error('Failed to load records:', error);
+      setRecords([]);
     } finally {
       setIsLoading(false);
     }
   };
 
   const applyFilters = () => {
-    let filtered = [...records];
+    try {
+      let filtered = [...records];
 
-    if (searchText) {
-      const searchLower = searchText.toLowerCase();
-      filtered = filtered.filter(record =>
-        record.title.toLowerCase().includes(searchLower) ||
-        record.provider.toLowerCase().includes(searchLower) ||
-        record.description.toLowerCase().includes(searchLower)
-      );
-    }
-
-    if (filterOptions.recordType !== 'all') {
-      filtered = filtered.filter(record => record.type === filterOptions.recordType);
-    }
-
-    if (filterOptions.dateRange !== 'all') {
-      const now = new Date();
-      let startDate;
-
-      switch (filterOptions.dateRange) {
-        case 'lastMonth':
-          startDate = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
-          break;
-        case 'last3Months':
-          startDate = new Date(now.getFullYear(), now.getMonth() - 3, now.getDate());
-          break;
-        case 'lastYear':
-          startDate = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
-          break;
-        default:
-          startDate = null;
+      if (searchText) {
+        const searchLower = searchText.toLowerCase();
+        filtered = filtered.filter(record =>
+          record.title?.toLowerCase().includes(searchLower) ||
+          record.provider?.toLowerCase().includes(searchLower) ||
+          record.description?.toLowerCase().includes(searchLower)
+        );
       }
 
-      if (startDate) {
-        filtered = filtered.filter(record => new Date(record.date) >= startDate);
+      if (filterOptions.recordType !== 'all') {
+        filtered = filtered.filter(record => record.type === filterOptions.recordType);
       }
-    }
 
-    if (filterOptions.provider !== 'all') {
-      filtered = filtered.filter(record => record.provider === filterOptions.provider);
-    }
+      if (filterOptions.dateRange !== 'all') {
+        const now = new Date();
+        let startDate;
 
-    if (filterOptions.keywords && filterOptions.keywords.length > 0) {
-      filtered = filtered.filter(record => {
-        return filterOptions.keywords.some(keyword => {
-          if (record.metadata?.keywords?.some(k =>
-            k.toLowerCase().includes(keyword.toLowerCase()) ||
-            keyword.toLowerCase().includes(k.toLowerCase())
-          )) {
-            return true;
-          }
-          const text = `${record.title} ${record.description} ${record.provider}`.toLowerCase();
-          return text.includes(keyword.toLowerCase());
-        });
-      });
-    }
+        switch (filterOptions.dateRange) {
+          case 'lastMonth':
+            startDate = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+            break;
+          case 'last3Months':
+            startDate = new Date(now.getFullYear(), now.getMonth() - 3, now.getDate());
+            break;
+          case 'lastYear':
+            startDate = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
+            break;
+          default:
+            startDate = null;
+        }
 
-    setFilteredRecords(filtered);
+        if (startDate) {
+          filtered = filtered.filter(record => new Date(record.date) >= startDate);
+        }
+      }
+
+      if (filterOptions.provider !== 'all') {
+        filtered = filtered.filter(record => record.provider === filterOptions.provider);
+      }
+
+      if (filterOptions.keywords && filterOptions.keywords.length > 0) {
+        filtered = filtered.filter(record =>
+          filterOptions.keywords.some(keyword => {
+            const keywordLower = keyword.toLowerCase();
+            const hasKeyword = record.metadata?.keywords?.some(k =>
+              k.toLowerCase().includes(keywordLower) ||
+              keywordLower.includes(k.toLowerCase())
+            );
+            if (hasKeyword) return true;
+
+            const combinedText = `${record.title} ${record.description} ${record.provider}`.toLowerCase();
+            return combinedText.includes(keywordLower);
+          })
+        );
+      }
+
+      setFilteredRecords(filtered);
+    } catch (error) {
+      console.error('Filter logic failed:', error);
+      setFilteredRecords([]);
+    }
   };
 
   const handleAccountChange = (accountId) => {
@@ -165,8 +172,8 @@ const RecordsScreen = () => {
       <Ionicons name="document-text-outline" size={64} color={theme.lightGray} />
       <Text style={[styles.emptyStateTitle, { color: theme.text }]}>No Records Found</Text>
       <Text style={[styles.emptyStateMessage, { color: theme.secondaryText }]}>
-        {searchText || filterOptions.recordType !== 'all' || filterOptions.dateRange !== 'all' || 
-         filterOptions.provider !== 'all' || (filterOptions.keywords?.length > 0)
+        {searchText || filterOptions.recordType !== 'all' || filterOptions.dateRange !== 'all' ||
+        filterOptions.provider !== 'all' || (filterOptions.keywords?.length > 0)
           ? 'Try changing your search or filter criteria.'
           : 'Upload your first medical record to start tracking your health information.'}
       </Text>
