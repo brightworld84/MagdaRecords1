@@ -21,6 +21,11 @@
     }
   },
   "submit": {
+    "preview": {
+      "ios": {
+        "appleId": "michael_fulbright@alumni.baylor.edu"
+      }
+    },
     "production": {
       "ios": {
         "appleId": "michael_fulbright@alumni.baylor.edu"
