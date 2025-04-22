@@ -1,83 +1,52 @@
 import React, { useState, useEffect } from 'react';
+import { View, Text, ActivityIndicator } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-import AppNavigator from './src/navigation/AppNavigator';
-import { AuthProvider } from './src/services/auth';
-import {
-  AppRegistry,
-  View,
-  Text,
-  ActivityIndicator,
-  LogBox,
-} from 'react-native';
 import { ThemeProvider } from './src/theme/themeContext';
+import { AuthProvider } from './src/services/auth';
 
-LogBox.ignoreLogs([
-  'Warning: ...',
-  'Possible Unhandled Promise Rejection',
-]);
+console.log('✅ App.js: Mounting main app...');
 
-console.log('✅ App.js: App component is mounting...');
-
-function AppContent() {
+export default function App() {
   const [isReady, setIsReady] = useState(false);
+  const [AppNavigator, setAppNavigator] = useState(null);
 
   useEffect(() => {
-    const prepare = async () => {
+    const initialize = async () => {
       try {
-        console.log('⏳ AppContent: preparing app...');
-        await new Promise(resolve => setTimeout(resolve, 500));
-      } catch (e) {
-        console.warn('⚠️ Failed to initialize app:', e);
+        console.log('⏳ App.js: Loading AppNavigator...');
+        const navigatorModule = await import('./src/navigation/AppNavigator');
+        setAppNavigator(() => navigatorModule.default);
+        console.log('✅ App.js: AppNavigator loaded');
+      } catch (error) {
+        console.error('❌ App.js: Failed to load AppNavigator:', error);
       } finally {
-        console.log('✅ AppContent: ready to load navigator');
         setIsReady(true);
       }
     };
 
-    prepare();
+    initialize();
   }, []);
 
-  if (!isReady) {
+  if (!isReady || !AppNavigator) {
     return (
-      <View
-        style={{
-          flex: 1,
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: '#ffffff',
-        }}
-      >
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#ffffff' }}>
         <ActivityIndicator size="large" color="#007aff" />
-        <Text
-          style={{
-            marginTop: 10,
-            color: '#333',
-            fontWeight: '500',
-          }}
-        >
-          Loading MagdaRecords...
+        <Text style={{ marginTop: 10, color: '#333', fontWeight: '500' }}>
+          Initializing MagdaRecords...
         </Text>
       </View>
     );
   }
-
-  return <AppNavigator />;
-}
-
-export default function App() {
-  console.log('✅ App.js: Rendering App with Providers');
 
   return (
     <SafeAreaProvider>
       <ThemeProvider>
         <AuthProvider>
           <StatusBar style="auto" />
-          <AppContent />
+          <AppNavigator />
         </AuthProvider>
       </ThemeProvider>
     </SafeAreaProvider>
   );
 }
-
-AppRegistry.registerComponent('MagdaRecords', () => App);
