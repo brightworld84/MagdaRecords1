@@ -42,24 +42,91 @@ const authReducer = (state, action) => {
 export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
+  // Wrapper for secure store operations that won't crash the app
+  const safeSecureStore = {
+    async getItemAsync(key) {
+      try {
+        return await SecureStore.getItemAsync(key);
+      } catch (error) {
+        console.error(`❌ SecureStore getItemAsync error for key '${key}':`, error);
+        return null;
+      }
+    },
+    async setItemAsync(key, value) {
+      try {
+        await SecureStore.setItemAsync(key, value);
+        return true;
+      } catch (error) {
+        console.error(`❌ SecureStore setItemAsync error for key '${key}':`, error);
+        return false;
+      }
+    },
+    async deleteItemAsync(key) {
+      try {
+        await SecureStore.deleteItemAsync(key);
+        return true;
+      } catch (error) {
+        console.error(`❌ SecureStore deleteItemAsync error for key '${key}':`, error);
+        return false;
+      }
+    }
+  };
+
+  // Safe decrypt with fallbacks
+  const safeDecrypt = async (encryptedData) => {
+    try {
+      if (!encryptedData) return null;
+      return await decryptData(encryptedData);
+    } catch (error) {
+      console.error('❌ Decryption error:', error);
+      // Return null rather than throwing
+      return null;
+    }
+  };
+
+  // Safe encrypt with fallbacks
+  const safeEncrypt = async (data) => {
+    try {
+      if (!data) return null;
+      return await encryptData(data);
+    } catch (error) {
+      console.error('❌ Encryption error:', error);
+      // If encryption fails, store unencrypted as last resort
+      console.warn('⚠️ Falling back to unencrypted storage');
+      return `unencrypted:${data}`;
+    }
+  };
+
   useEffect(() => {
     const checkAuth = async () => {
       try {
         console.log('🔑 AuthProvider: checking for existing user...');
         dispatch({ type: 'SET_LOADING', payload: true });
 
-        const userJson = await SecureStore.getItemAsync(AUTH_KEYS.USER_DATA);
+        const userJson = await safeSecureStore.getItemAsync(AUTH_KEYS.USER_DATA);
+        console.log('📂 Got stored user data:', userJson ? 'Yes' : 'No');
 
         if (userJson) {
           try {
-            const decryptedUserJson = await decryptData(userJson);
-            const userData = JSON.parse(decryptedUserJson);
+            // Check if using fallback unencrypted storage
+            let userData;
+            if (userJson.startsWith('unencrypted:')) {
+              const unencryptedData = userJson.substring(12);
+              userData = JSON.parse(unencryptedData);
+            } else {
+              const decryptedUserJson = await safeDecrypt(userJson);
+              if (!decryptedUserJson) {
+                throw new Error('Decryption returned null');
+              }
+              userData = JSON.parse(decryptedUserJson);
+            }
 
-            console.log('✅ Dispatching login for:', userData);
+            console.log('✅ User data parsed successfully:', userData.email);
             dispatch({ type: 'LOGIN', payload: userData });
           } catch (parseError) {
-            console.warn('⚠️ Could not parse user data. Clearing corrupted entry.');
-            await SecureStore.deleteItemAsync(AUTH_KEYS.USER_DATA);
+            console.warn('⚠️ Could not parse user data:', parseError);
+            console.log('⚠️ Clearing corrupted user data and continuing...');
+            await safeSecureStore.deleteItemAsync(AUTH_KEYS.USER_DATA);
           }
         } else {
           console.log('ℹ️ No stored user found.');
@@ -71,7 +138,10 @@ export const AuthProvider = ({ children }) => {
       }
     };
 
-    checkAuth();
+    // Add a delay to ensure initialization is complete
+    setTimeout(() => {
+      checkAuth();
+    }, 500);
   }, []);
 
   const register = async (userData) => {
@@ -82,11 +152,24 @@ export const AuthProvider = ({ children }) => {
         createdAt: new Date().toISOString(),
         biometricEnabled: false,
       };
-      const encrypted = await encryptData(JSON.stringify(newUser));
-      await SecureStore.setItemAsync(AUTH_KEYS.USER_DATA, encrypted);
+      
+      // Convert to string first to handle errors early
+      const userString = JSON.stringify(newUser);
+      const encrypted = await safeEncrypt(userString);
+      
+      if (!encrypted) {
+        throw new Error('Failed to encrypt user data');
+      }
+      
+      const stored = await safeSecureStore.setItemAsync(AUTH_KEYS.USER_DATA, encrypted);
+      if (!stored) {
+        throw new Error('Failed to store user data');
+      }
+      
       dispatch({ type: 'LOGIN', payload: newUser });
       return newUser;
     } catch (error) {
+      console.error('❌ Registration error:', error);
       dispatch({ type: 'AUTH_ERROR', payload: error.message || 'Registration failed' });
       throw error;
     }
@@ -94,7 +177,11 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password, provider = 'email') => {
     try {
-      const emailHash = email.split('').reduce((a, b) => a + b.charCodeAt(0), 0);
+      // Generate simple hash for demo
+      const emailHash = Array.from(email)
+        .reduce((a, b) => a + b.charCodeAt(0), 0)
+        .toString();
+      
       const testUser = {
         id: `user-${emailHash}`,
         email,
@@ -105,11 +192,23 @@ export const AuthProvider = ({ children }) => {
         biometricEnabled: false,
       };
 
-      const encrypted = await encryptData(JSON.stringify(testUser));
-      await SecureStore.setItemAsync(AUTH_KEYS.USER_DATA, encrypted);
+      // Convert to string first
+      const userString = JSON.stringify(testUser);
+      const encrypted = await safeEncrypt(userString);
+      
+      if (!encrypted) {
+        throw new Error('Failed to encrypt user data');
+      }
+      
+      const stored = await safeSecureStore.setItemAsync(AUTH_KEYS.USER_DATA, encrypted);
+      if (!stored) {
+        throw new Error('Failed to store user data');
+      }
+      
       dispatch({ type: 'LOGIN', payload: testUser });
       return testUser;
     } catch (error) {
+      console.error('❌ Login error:', error);
       dispatch({ type: 'AUTH_ERROR', payload: error.message || 'Login failed' });
       throw error;
     }
@@ -117,13 +216,30 @@ export const AuthProvider = ({ children }) => {
 
   const tryLocalAuth = async () => {
     try {
-      const userJson = await SecureStore.getItemAsync(AUTH_KEYS.USER_DATA);
-      if (!userJson) throw new Error('No stored user found');
-      const decrypted = await decryptData(userJson);
-      const user = JSON.parse(decrypted);
-      if (!user.biometricEnabled) throw new Error('Biometric authentication not enabled');
-      dispatch({ type: 'LOGIN', payload: user });
+      const userJson = await safeSecureStore.getItemAsync(AUTH_KEYS.USER_DATA);
+      if (!userJson) {
+        throw new Error('No stored user found');
+      }
+      
+      let userData;
+      if (userJson.startsWith('unencrypted:')) {
+        const unencryptedData = userJson.substring(12);
+        userData = JSON.parse(unencryptedData);
+      } else {
+        const decrypted = await safeDecrypt(userJson);
+        if (!decrypted) {
+          throw new Error('Decryption failed');
+        }
+        userData = JSON.parse(decrypted);
+      }
+      
+      if (!userData.biometricEnabled) {
+        throw new Error('Biometric authentication not enabled');
+      }
+      
+      dispatch({ type: 'LOGIN', payload: userData });
     } catch (error) {
+      console.error('❌ Biometric auth error:', error);
       dispatch({ type: 'AUTH_ERROR', payload: error.message || 'Biometric login failed' });
       throw error;
     }
@@ -131,10 +247,21 @@ export const AuthProvider = ({ children }) => {
 
   const updateUser = async (userData) => {
     try {
-      const encrypted = await encryptData(JSON.stringify(userData));
-      await SecureStore.setItemAsync(AUTH_KEYS.USER_DATA, encrypted);
+      const userString = JSON.stringify(userData);
+      const encrypted = await safeEncrypt(userString);
+      
+      if (!encrypted) {
+        throw new Error('Failed to encrypt user data');
+      }
+      
+      const stored = await safeSecureStore.setItemAsync(AUTH_KEYS.USER_DATA, encrypted);
+      if (!stored) {
+        throw new Error('Failed to store user data');
+      }
+      
       dispatch({ type: 'UPDATE_USER', payload: userData });
     } catch (error) {
+      console.error('❌ Update user error:', error);
       dispatch({ type: 'AUTH_ERROR', payload: error.message || 'Failed to update user' });
       throw error;
     }
@@ -142,7 +269,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await SecureStore.deleteItemAsync(AUTH_KEYS.USER_DATA);
+      await safeSecureStore.deleteItemAsync(AUTH_KEYS.USER_DATA);
       dispatch({ type: 'LOGOUT' });
     } catch (error) {
       console.error('❌ Logout error:', error);
@@ -162,8 +289,14 @@ export const getApiKey = async () => {
   try {
     const encryptedKey = await SecureStore.getItemAsync(AUTH_KEYS.OPENAI_API_KEY);
     if (!encryptedKey) return null;
-    const decrypted = await decryptData(encryptedKey);
-    return decrypted;
+    
+    try {
+      const decrypted = await decryptData(encryptedKey);
+      return decrypted;
+    } catch (decryptError) {
+      console.error('❌ API key decryption failed:', decryptError);
+      return null;
+    }
   } catch (error) {
     console.error('❌ Failed to retrieve API key:', error);
     return null;
