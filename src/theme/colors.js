@@ -1,21 +1,21 @@
 // src/theme/colors.js
 
 const colors = {
-  // Primary colors
+  // Primary palette
   primary: '#2B6CB0',
   primaryLight: '#E6F0FA',
   primaryDark: '#1A4A80',
 
-  // Secondary colors
+  // Secondary palette
   secondary: '#38B2AC',
   secondaryLight: '#E6F6F5',
   secondaryDark: '#2C8A86',
 
-  // Accent colors
+  // Accent palette
   accent: '#805AD5',
   accentLight: '#F0E7FB',
 
-  // Neutral colors
+  // Neutrals and backgrounds
   white: '#FFFFFF',
   background: '#F7FAFC',
   lightBackground: '#EDF2F7',
@@ -23,17 +23,19 @@ const colors = {
   gray: '#A0AEC0',
   mediumGray: '#718096',
   darkGray: '#4A5568',
-  text: '#2D3748',
-  secondaryText: '#718096',
   black: '#1A202C',
 
-  // Semantic colors
+  // Text colors
+  text: '#2D3748',
+  secondaryText: '#718096',
+
+  // Semantic statuses
   error: '#E53E3E',
   warning: '#DD6B20',
   success: '#38A169',
   info: '#3182CE',
 
-  // Specific use case
+  // UI-specific
   cardBg: '#FFFFFF',
   shadow: 'rgba(0, 0, 0, 0.1)',
   overlay: 'rgba(0, 0, 0, 0.5)',
@@ -41,8 +43,8 @@ const colors = {
   inputBackground: '#FFFFFF',
   inputBorder: '#CBD5E0',
 
-  // 🔧 Required for full compatibility
-  buttonBackground: '#2B6CB0', // Match your primary color
+  // Full compatibility
+  buttonBackground: '#2B6CB0', // Matches primary
   buttonText: '#FFFFFF',
   modalBackground: '#FFFFFF',
 };

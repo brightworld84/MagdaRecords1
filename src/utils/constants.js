@@ -34,3 +34,10 @@ export const API_ENDPOINTS = {
   AI: '/ai',
 };
 
+// Error messages
+export const ERROR_MESSAGES = {
+  REQUIRED_FIELD: 'This field is required',
+  INVALID_EMAIL: 'Please enter a valid email address',
+  INVALID_PASSWORD: 'Password must be at least 8 characters long',
+  INVALID_DATE: 'Please enter a valid date (MM/DD/YYYY)',
+};

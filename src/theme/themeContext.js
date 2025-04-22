@@ -22,25 +22,32 @@ export const useTheme = () => {
 };
 
 export const ThemeProvider = ({ children }) => {
-  const systemColorScheme = Appearance?.getColorScheme?.() || 'light';
-  const [themeMode, setThemeMode] = useState(systemColorScheme);
+  const defaultThemeMode = Appearance?.getColorScheme?.() || 'light';
+  const [themeMode, setThemeMode] = useState(defaultThemeMode);
 
   useEffect(() => {
     const listener = ({ colorScheme }) => {
       if (colorScheme) {
         setThemeMode(colorScheme);
+        console.log(`🌗 System theme changed: ${colorScheme}`);
       }
     };
 
     const subscription = Appearance?.addChangeListener?.(listener);
-    return () => subscription?.remove?.();
+    return () => {
+      if (typeof subscription?.remove === 'function') {
+        subscription.remove();
+      }
+    };
   }, []);
 
   const isDarkMode = themeMode === 'dark';
   const theme = isDarkMode ? darkColors : lightColors;
 
   const toggleDarkMode = () => {
-    setThemeMode((prev) => (prev === 'dark' ? 'light' : 'dark'));
+    const newMode = themeMode === 'dark' ? 'light' : 'dark';
+    setThemeMode(newMode);
+    console.log(`🌓 User toggled theme: ${newMode}`);
   };
 
   const value = useMemo(

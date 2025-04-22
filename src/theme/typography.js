@@ -1,7 +1,7 @@
 import { Platform } from 'react-native';
 import colors from './colors';
 
-// Font family based on platform
+// Font families based on platform
 const fontFamily = Platform.select({
   ios: {
     regular: 'System',
@@ -15,7 +15,7 @@ const fontFamily = Platform.select({
   },
 });
 
-// Typography styles for the application
+// Typography styles
 const typography = {
   // Headings
   h1: {
@@ -51,7 +51,7 @@ const typography = {
     letterSpacing: 0.1,
   },
 
-  // Body text
+  // Body
   body: {
     fontFamily: fontFamily.regular,
     fontSize: 16,
@@ -99,7 +99,7 @@ const typography = {
     letterSpacing: 0.1,
   },
 
-  // Buttons
+  // Button
   button: {
     fontFamily: fontFamily.medium,
     fontSize: 16,
@@ -109,7 +109,7 @@ const typography = {
     letterSpacing: 0.1,
   },
 
-  // Small text
+  // Small
   small: {
     fontFamily: fontFamily.regular,
     fontSize: 12,
@@ -119,7 +119,7 @@ const typography = {
     letterSpacing: 0.4,
   },
 
-  // Input text
+  // Inputs
   input: {
     fontFamily: fontFamily.regular,
     fontSize: 16,
@@ -128,8 +128,8 @@ const typography = {
     color: colors.text,
     letterSpacing: 0.5,
   },
-  
-  // Regular text
+
+  // Regular
   regular: {
     fontFamily: fontFamily.regular,
     fontSize: 14,
@@ -139,7 +139,7 @@ const typography = {
     letterSpacing: 0.25,
   },
 
-  // Large numbers
+  // Numbers (Large stats)
   number: {
     fontFamily: fontFamily.medium,
     fontSize: 48,
@@ -149,7 +149,7 @@ const typography = {
     letterSpacing: -0.5,
   },
 
-  // Font sizes for dynamic text sizing
+  // Optional: scalable font sizes for future dynamic sizing (currently unused)
   fontSize: {
     small: {
       h1: 24,

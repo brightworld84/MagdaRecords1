@@ -8,10 +8,12 @@ export const validateEmail = (email) => {
 
 // Validate password strength
 export const validatePassword = (password) => {
+  const defaultInvalidMessage = 'Password must be at least 8 characters and meet complexity requirements';
+
   if (password.length < 8) {
     return {
       isValid: false,
-      errorMessage: ERROR_MESSAGES.INVALID_PASSWORD,
+      errorMessage: ERROR_MESSAGES.INVALID_PASSWORD || defaultInvalidMessage,
     };
   }
 
